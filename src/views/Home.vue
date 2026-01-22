@@ -17,6 +17,10 @@
           <div class="quick-link-icon">🔧</div>
           <div class="quick-link-text">金融服务</div>
         </router-link>
+        <router-link to="/applications" class="quick-link-item">
+          <div class="quick-link-icon">📱</div>
+          <div class="quick-link-text">应用管理</div>
+        </router-link>
       </div>
     </div>
     

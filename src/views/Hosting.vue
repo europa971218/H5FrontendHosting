@@ -7,6 +7,7 @@
         <router-link to="/tenant-management" class="tab">租户管理</router-link>
         <router-link to="/user-management" class="tab">用户管理</router-link>
         <router-link to="/organization-management" class="tab">机构管理</router-link>
+        <router-link to="/hosting" class="tab" :class="{ active: $route.path === '/hosting' }">托管管理</router-link>
         <router-link to="/platform-monitoring" class="tab">平台监控</router-link>
         <router-link to="/alert-center" class="tab">告警中心</router-link>
         <router-link to="/platform-logs" class="tab">平台日志</router-link>
@@ -15,22 +16,31 @@
         <router-link to="/help-center" class="tab">帮助中心</router-link>
         <router-link to="/monitoring-management" class="tab">监控管理</router-link>
         <router-link to="/version-management" class="tab">版本管理</router-link>
+        <router-link to="/link-management" class="tab" :class="{ active: $route.path === '/link-management' }">链路管理</router-link>
       </div>
     </header>
 
     <!-- 页面内容 -->
     <main class="content">
       <!-- 托管页面标题 -->
-      <div class="section-header">
-        <h2>托管管理</h2>
+      <div class="section-header animate__animated animate__fadeInDown">
+        <h2><font-awesome-icon icon="cubes" /> 托管管理</h2>
         <div class="header-actions">
-          <button class="btn btn-primary">新增应用</button>
-          <button class="btn btn-secondary">批量导入</button>
+          <button class="btn btn-primary" v-wave>
+            <font-awesome-icon icon="plus" /> 新增应用
+          </button>
+          <button class="btn btn-secondary" v-wave>
+            <font-awesome-icon icon="upload" /> 批量导入
+          </button>
         </div>
       </div>
 
       <!-- 筛选区域 -->
-      <div class="filters">
+      <div class="filters animate__animated animate__fadeInUp">
+        <div class="filter-group">
+          <label>应用名称</label>
+          <input type="text" class="filter-input" placeholder="请输入应用名称">
+        </div>
         <div class="filter-group">
           <label>应用状态</label>
           <select class="filter-select">
@@ -51,16 +61,29 @@
         </div>
         <div class="filter-group">
           <label>创建时间</label>
-          <input type="text" class="filter-input" placeholder="请选择时间范围">
+          <el-date-picker
+            v-model="dateRange"
+            type="daterange"
+            range-separator=" - "
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            format="YYYY-MM-DD"
+            value-format="YYYY-MM-DD"
+            style="width: 200px"
+          />
         </div>
-        <div class="filter-group">
-          <button class="btn btn-search">搜索</button>
-          <button class="btn btn-reset">重置</button>
+        <div class="filter-group filter-actions">
+          <button class="btn btn-search" v-wave>
+            <font-awesome-icon icon="search" /> 搜索
+          </button>
+          <button class="btn btn-reset" v-wave>
+            <font-awesome-icon icon="sync-alt" /> 重置
+          </button>
         </div>
       </div>
 
       <!-- 数据表格 -->
-      <div class="table-container">
+      <div class="table-container animate__animated animate__fadeInUp">
         <table class="data-table">
           <thead>
             <tr>
@@ -80,14 +103,22 @@
               <td>银行APP</td>
               <td>APP001</td>
               <td>移动端应用</td>
-              <td><span class="status status-running">运行中</span></td>
+              <td><span class="status status-running"><font-awesome-icon icon="play-circle" /> 运行中</span></td>
               <td>2025-12-01</td>
               <td>2026-01-22</td>
               <td>
-                <button class="action-btn view">查看</button>
-                <button class="action-btn edit">编辑</button>
-                <button class="action-btn stop">停止</button>
-                <button class="action-btn delete">删除</button>
+                <button class="action-btn view" v-wave>
+                  <font-awesome-icon icon="eye" /> 查看
+                </button>
+                <button class="action-btn edit" v-wave>
+                  <font-awesome-icon icon="edit" /> 编辑
+                </button>
+                <button class="action-btn stop" v-wave>
+                  <font-awesome-icon icon="stop-circle" /> 停止
+                </button>
+                <button class="action-btn delete" v-wave>
+                  <font-awesome-icon icon="trash-alt" /> 删除
+                </button>
               </td>
             </tr>
             <tr>
@@ -158,7 +189,8 @@ export default {
   name: 'Hosting',
   data() {
     return {
-      applications: []
+      applications: [],
+      dateRange: null // 日期范围
     }
   },
   mounted() {
@@ -297,6 +329,14 @@ export default {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+/* 筛选操作区域 */
+.filter-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
 }
 
 .filter-group {

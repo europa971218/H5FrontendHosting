@@ -20,13 +20,176 @@
 
     <!-- 页面内容 -->
     <main class="content">
+      <!-- 操作审计内容 -->
+      <div v-if="$route.path === '/operation-audit' || $route.path === '/audit'">
+        <h2>操作审计</h2>
+        
+        <!-- 查询区 -->
+        <div class="search-section">
+          <div class="search-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>平台</label>
+                <select v-model="auditSearchParams.platform" class="form-select">
+                  <option value="">全部</option>
+                  <option value="系统管理端">系统管理端</option>
+                  <option value="租户管理端">租户管理端</option>
+                  <option value="用户端">用户端</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label>操作类型</label>
+                <select v-model="auditSearchParams.operationType" class="form-select">
+                  <option value="">全部</option>
+                  <option value="登录">登录</option>
+                  <option value="创建">创建</option>
+                  <option value="更新">更新</option>
+                  <option value="删除">删除</option>
+                  <option value="开关">开关</option>
+                  <option value="上传下载">上传下载</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label>时间范围</label>
+                <div class="date-range">
+                  <input 
+                    type="date" 
+                    v-model="auditSearchParams.startDate" 
+                    class="form-input"
+                  >
+                  <span class="date-separator">至</span>
+                  <input 
+                    type="date" 
+                    v-model="auditSearchParams.endDate" 
+                    class="form-input"
+                  >
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label>应用</label>
+                <select v-model="auditSearchParams.application" class="form-select">
+                  <option value="">全部</option>
+                  <option value="应用1">应用1</option>
+                  <option value="应用2">应用2</option>
+                  <option value="应用3">应用3</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label>功能模块</label>
+                <select v-model="auditSearchParams.module" class="form-select">
+                  <option value="">全部</option>
+                  <option value="用户模块">用户模块</option>
+                  <option value="应用概况">应用概况</option>
+                  <option value="部署管理">部署管理</option>
+                  <option value="监控管理">监控管理</option>
+                  <option value="告警管理">告警管理</option>
+                  <option value="租户管理">租户管理</option>
+                  <option value="团队管理">团队管理</option>
+                  <option value="角色管理">角色管理</option>
+                  <option value="应用管理">应用管理</option>
+                  <option value="平台告警">平台告警</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label>操作行为</label>
+                <input 
+                  type="text" 
+                  v-model="auditSearchParams.operation" 
+                  placeholder="请输入操作行为" 
+                  class="form-input"
+                >
+              </div>
+            </div>
+            
+            <div class="search-actions">
+              <button class="btn btn-primary" @click="auditSearch">查询</button>
+              <button class="btn" @click="resetAuditSearch">重置</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 表格区 -->
+        <div class="table-section">
+          <div class="table-container">
+            <table class="audit-table">
+              <thead>
+                <tr>
+                  <th>操作时间</th>
+                  <th>操作用户</th>
+                  <th>IP</th>
+                  <th>平台</th>
+                  <th>应用</th>
+                  <th>功能模块</th>
+                  <th>操作类型</th>
+                  <th>操作行为</th>
+                  <th>说明</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="record in auditRecords" :key="record.id">
+                  <td>{{ formatDateTime(record.operationTime) }}</td>
+                  <td>{{ record.username }}</td>
+                  <td>{{ record.ip }}</td>
+                  <td>{{ record.platform }}</td>
+                  <td>{{ record.application || '-' }}</td>
+                  <td>{{ record.module }}</td>
+                  <td>
+                    <span class="operation-type-tag" :class="getOperationTypeClass(record.operationType)">
+                      {{ record.operationType }}
+                    </span>
+                  </td>
+                  <td>{{ record.operation }}</td>
+                  <td>{{ record.description || '-' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- 分页 -->
+          <div class="pagination">
+            <div class="page-info">
+              共 {{ auditTotalRecords }} 条记录，当前第 {{ auditCurrentPage }} / {{ auditTotalPages }} 页
+            </div>
+            <div class="page-controls">
+              <button 
+                class="btn page-btn" 
+                @click="auditPrevPage" 
+                :disabled="auditCurrentPage === 1"
+              >
+                上一页
+              </button>
+              <button 
+                class="btn page-btn" 
+                @click="auditNextPage" 
+                :disabled="auditCurrentPage === auditTotalPages"
+              >
+                下一页
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 数据概览内容 -->
+      <div v-else>
       <!-- 数据概览标题 -->
-      <div class="section-header">
-        <h2>数据概览</h2>
+      <div class="section-header animate__animated animate__fadeInDown">
+        <h2><font-awesome-icon icon="chart-line" /> 数据概览</h2>
         <!-- 新增导航 -->
         <div class="data-nav">
-          <span class="nav-item" :class="{ active: activeNav === '应用运营' }" @click="switchNav('应用运营')">应用运营</span>
-          <span class="nav-item" :class="{ active: activeNav === '资源使用' }" @click="switchNav('资源使用')">资源使用</span>
+          <span class="nav-item" :class="{ active: activeNav === '应用运营' }" @click="switchNav('应用运营')" v-wave>
+            <font-awesome-icon icon="cubes" /> 应用运营
+          </span>
+          <span class="nav-item" :class="{ active: activeNav === '资源使用' }" @click="switchNav('资源使用')" v-wave>
+            <font-awesome-icon icon="server" /> 资源使用
+          </span>
         </div>
       </div>
 
@@ -521,6 +684,7 @@
           </div>
         </div>
       </div>
+      </div>
     </main>
   </div>
 </template>
@@ -542,11 +706,100 @@ export default {
       activeStatType2: '月度统计', // 应用运营请求/部署统计类型
       activeStatType3: '月度统计', // 资源使用统计类型
       // 当前激活的导航项
-      activeNav: '应用运营'
+      activeNav: '应用运营',
+      // 后端数据
+      backendData: {
+        applicationStats: null,
+        deploymentRank: null,
+        packageSizeRank: null,
+        platformMonitoring: null,
+        resourceUsage: null
+      },
+      
+      // 操作审计相关数据
+      auditSearchParams: {
+        platform: '',
+        operationType: '',
+        startDate: this.getDateBefore(7), // 默认最近7天
+        endDate: this.getToday(),
+        application: '',
+        module: '',
+        operation: ''
+      },
+      
+      // 操作审计表格数据
+      auditRecords: [
+        {
+          id: 1,
+          operationTime: '2024-11-26T10:30:00',
+          username: 'sysadmin',
+          ip: '192.168.1.1',
+          platform: '系统管理端',
+          application: '',
+          module: '租户管理',
+          operationType: '创建',
+          operation: '创建租户',
+          description: '创建了名为租户A的新租户'
+        },
+        {
+          id: 2,
+          operationTime: '2024-11-26T09:15:00',
+          username: 'tenantadmin1',
+          ip: '192.168.1.2',
+          platform: '租户管理端',
+          application: '应用1',
+          module: '应用管理',
+          operationType: '更新',
+          operation: '编辑应用',
+          description: '更新了应用1的基本信息'
+        },
+        {
+          id: 3,
+          operationTime: '2024-11-25T16:45:00',
+          username: 'tenantuser1',
+          ip: '192.168.1.3',
+          platform: '用户端',
+          application: '应用2',
+          module: '部署管理',
+          operationType: '上传下载',
+          operation: '上传部署包',
+          description: '上传了应用2的新版本部署包'
+        },
+        {
+          id: 4,
+          operationTime: '2024-11-25T14:20:00',
+          username: 'sysadmin',
+          ip: '192.168.1.1',
+          platform: '系统管理端',
+          application: '',
+          module: '用户管理',
+          operationType: '创建',
+          operation: '新增用户',
+          description: '创建了新的租户管理员用户'
+        },
+        {
+          id: 5,
+          operationTime: '2024-11-24T11:50:00',
+          username: 'tenantuser2',
+          ip: '192.168.1.4',
+          platform: '用户端',
+          application: '应用3',
+          module: '监控管理',
+          operationType: '开关',
+          operation: '开启健康检查',
+          description: '开启了应用3的健康检查功能'
+        }
+      ],
+      
+      // 操作审计分页参数
+      auditCurrentPage: 1,
+      auditPageSize: 20,
+      auditTotalRecords: 5,
+      auditTotalPages: 1
     }
   },
   mounted() {
-    this.initCharts()
+    this.fetchDataFromBackend()
     // 监听窗口大小变化，自动调整图表大小
     window.addEventListener('resize', this.resizeCharts)
   },
@@ -556,6 +809,22 @@ export default {
     window.removeEventListener('resize', this.resizeCharts)
   },
   methods: {
+    // 从后端获取数据
+    async fetchDataFromBackend() {
+      try {
+        // 调用后端API获取数据概览
+        const response = await fetch('http://localhost:3003/api/data/overview')
+        if (response.ok) {
+          const result = await response.json()
+          if (result.success) {
+            this.backendData = result.data
+            this.initCharts() // 数据获取成功后初始化图表
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch data from backend:', error)
+      }
+    },
     initCharts() {
       // 清理现有的图表实例
       Object.values(this.charts).forEach(chart => chart.dispose())
@@ -565,6 +834,20 @@ export default {
         // 获取当前统计类型和日期范围
         const isQuarterly1 = this.activeStatType1 === '季度统计'
         const isQuarterly2 = this.activeStatType2 === '季度统计'
+        
+        // 使用后端数据或默认值
+        const appStats = this.backendData.applicationStats || {
+          requests: { trend: [{ date: '2025-05', value: 188.5 }, { date: '2025-06', value: 140.0 }] },
+          alerts: { trend: [{ date: '2025-05', value: 3 }, { date: '2025-06', value: 0 }] },
+          deployments: { trend: [{ date: '2025-05', value: 187183 }, { date: '2025-06', value: 20297 }] },
+          exceptions: { trend: [{ date: '2025-05', value: 0.1 }, { date: '2025-06', value: 0.1 }] }
+        }
+        
+        const deploymentRank = this.backendData.deploymentRank || Array.from({ length: 30 }, (_, i) => ({
+          rank: i + 1,
+          applicationName: `应用${String.fromCharCode(65 + Math.floor(i / 5))}${i + 1}`,
+          deployments: Math.floor(Math.random() * 50) + 5
+        }))
         
         // 托管用户(新增) - 折线图
         this.charts.newUsers = this.initLineChart(
@@ -613,59 +896,64 @@ export default {
         // 应用请求数 - 柱状图
         this.charts.ossCapacity = this.initBarChart(
           this.$refs.ossCapacityChart,
-          isQuarterly2 ? ['2025-Q4', '2026-Q1'] : ['2025-05', '2025-06'],
-          isQuarterly2 ? [250, 180] : [188.5, 140.0],
+          appStats.requests.trend.map(item => item.date),
+          appStats.requests.trend.map(item => item.value),
           '应用请求数'
         )
 
         // 应用告警次数 - 折线图
         this.charts.platformAlert = this.initLineChart(
           this.$refs.platformAlertChart,
-          isQuarterly2 ? ['2025-Q4', '2026-Q1'] : ['2025-05', '2025-06'],
-          isQuarterly2 ? [5, 2] : [3, 0],
+          appStats.alerts.trend.map(item => item.date),
+          appStats.alerts.trend.map(item => item.value),
           '应用告警次数'
         )
 
         // 应用部署次数 - 柱状图
         this.charts.appRequests = this.initBarChart(
           this.$refs.appRequestsChart,
-          isQuarterly2 ? ['2025-Q4', '2026-Q1'] : ['2025-05', '2025-06'],
-          isQuarterly2 ? [220000, 50000] : [187183, 20297],
+          appStats.deployments.trend.map(item => item.date),
+          appStats.deployments.trend.map(item => item.value),
           '应用部署次数'
         )
 
         // 应用异常拦截次数 - 折线图
         this.charts.appAlert = this.initLineChart(
           this.$refs.appAlertChart,
-          isQuarterly2 ? ['2025-Q4', '2026-Q1'] : ['2025-05', '2025-06'],
-          isQuarterly2 ? [0.2, 0.15] : [0.1, 0.1],
+          appStats.exceptions.trend.map(item => item.date),
+          appStats.exceptions.trend.map(item => item.value),
           '应用异常拦截次数'
         )
 
         // 应用部署次数排名TOP30（当季） - 水平柱状图
         this.charts.deployRanking = this.initHorizontalBarChart(
           this.$refs.deployRankingChart,
-          ['应用30', '应用29', '应用28', '应用27', '应用26', '应用25', '应用24', '应用23', '应用22', '应用21', '应用20', '应用19', '应用18', '应用17', '应用16', '应用15', '应用14', '应用13', '应用12', '应用11', '效能工具', '悦农生活-商户端 PC', '悦农缴费商户端', '悦农生活-运营端', 'H5开发者门户', '隔离1016应用', '共享1016应用', '代发薪-企业端（内网）', '代发薪-企业端', '电子管理平台 web 端'],
-          isQuarterly2 ? [5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 35, 38, 42, 48, 55, 62, 68, 75, 88, 95, 120, 135, 150] : [3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 35, 38, 42, 48, 55, 62, 68, 75, 88, 95, 120],
+          deploymentRank.map(item => item.applicationName),
+          deploymentRank.map(item => item.deployments),
           '应用部署次数排名top30（当季）'
         )
       } else if (this.activeNav === '资源使用') {
         // 获取当前统计类型
         const isQuarterly = this.activeStatType3 === '季度统计'
         
+        // 使用后端数据或默认值
+        const resourceUsage = this.backendData.resourceUsage || {
+          trend: [{ time: '2025-11', cpu: 0 }, { time: '2025-12', cpu: 0 }, { time: '2026-01', cpu: 0 }]
+        }
+        
         // OSS使用容量 - 折线图
         this.charts.ossCapacity2 = this.initLineChart(
           this.$refs.ossCapacityChart2,
-          isQuarterly ? ['2025-Q4', '2026-Q1'] : ['2025-11', '2025-12', '2026-01'],
-          isQuarterly ? [0.5, 1.2] : [0, 0, 0],
+          isQuarterly ? ['2025-Q4', '2026-Q1'] : resourceUsage.trend.map(item => item.time),
+          isQuarterly ? [0.5, 1.2] : resourceUsage.trend.map(item => item.cpu),
           'OSS使用容量'
         )
 
         // 平台告警次数 - 折线图
         this.charts.platformAlert2 = this.initLineChart(
           this.$refs.platformAlertChart2,
-          isQuarterly ? ['2025-Q4', '2026-Q1'] : ['2025-11', '2025-12', '2026-01'],
-          isQuarterly ? [15000, 5000] : [8000, 12000, 2000],
+          isQuarterly ? ['2025-Q4', '2026-Q1'] : resourceUsage.trend.map(item => item.time),
+          isQuarterly ? [15000, 5000] : resourceUsage.trend.map(item => item.memory ? item.memory * 1000 : 0),
           '平台告警次数'
         )
       }
@@ -1022,9 +1310,132 @@ export default {
     // 调整所有图表大小
     resizeCharts() {
       Object.values(this.charts).forEach(chart => chart.resize())
+      },
+      
+      // 操作审计相关方法
+      // 获取当前日期
+      getToday() {
+        const today = new Date();
+        return today.toISOString().split('T')[0];
+      },
+      
+      // 获取n天前的日期
+      getDateBefore(days) {
+        const date = new Date();
+        date.setDate(date.getDate() - days);
+        return date.toISOString().split('T')[0];
+      },
+      
+      // 格式化日期时间
+      formatDateTime(dateTime) {
+        const date = new Date(dateTime);
+        return date.toLocaleString('zh-CN', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        });
+      },
+      
+      // 根据操作类型获取样式类
+      getOperationTypeClass(type) {
+        const typeMap = {
+          '登录': 'login',
+          '创建': 'create',
+          '更新': 'update',
+          '删除': 'delete',
+          '开关': 'switch',
+          '上传下载': 'upload'
+        };
+        return typeMap[type] || '';
+      },
+      
+      // 操作审计搜索
+      auditSearch() {
+        console.log('搜索参数:', this.auditSearchParams);
+        // 这里可以添加实际的搜索逻辑，调用API获取数据
+        // 模拟搜索结果
+        const filteredRecords = this.auditRecords.filter(record => {
+          let match = true;
+          
+          if (this.auditSearchParams.platform && record.platform !== this.auditSearchParams.platform) {
+            match = false;
+          }
+          
+          if (this.auditSearchParams.operationType && record.operationType !== this.auditSearchParams.operationType) {
+            match = false;
+          }
+          
+          if (this.auditSearchParams.operation) {
+            const operation = this.auditSearchParams.operation.toLowerCase();
+            if (!record.operation.toLowerCase().includes(operation)) {
+              match = false;
+            }
+          }
+          
+          if (this.auditSearchParams.module && record.module !== this.auditSearchParams.module) {
+            match = false;
+          }
+          
+          // 时间范围过滤
+          if (this.auditSearchParams.startDate) {
+            const recordDate = new Date(record.operationTime).toISOString().split('T')[0];
+            if (recordDate < this.auditSearchParams.startDate) {
+              match = false;
+            }
+          }
+          
+          if (this.auditSearchParams.endDate) {
+            const recordDate = new Date(record.operationTime).toISOString().split('T')[0];
+            if (recordDate > this.auditSearchParams.endDate) {
+              match = false;
+            }
+          }
+          
+          return match;
+        });
+        
+        this.auditTotalRecords = filteredRecords.length;
+        this.calculateAuditTotalPages();
+        this.auditCurrentPage = 1;
+      },
+      
+      // 重置操作审计搜索
+      resetAuditSearch() {
+        this.auditSearchParams = {
+          platform: '',
+          operationType: '',
+          startDate: this.getDateBefore(7),
+          endDate: this.getToday(),
+          application: '',
+          module: '',
+          operation: ''
+        };
+        this.auditSearch();
+      },
+      
+      // 计算操作审计总页数
+      calculateAuditTotalPages() {
+        this.auditTotalPages = Math.ceil(this.auditTotalRecords / this.auditPageSize);
+      },
+      
+      // 操作审计上一页
+      auditPrevPage() {
+        if (this.auditCurrentPage > 1) {
+          this.auditCurrentPage--;
+        }
+      },
+      
+      // 操作审计下一页
+      auditNextPage() {
+        if (this.auditCurrentPage < this.auditTotalPages) {
+          this.auditCurrentPage++;
+        }
+      }
     }
   }
-}
 </script>
 
 <style scoped>
@@ -1416,6 +1827,208 @@ export default {
   color: #999;
   font-size: 1.1rem;
   margin: 0;
+}
+
+/* 操作审计相关样式 */
+/* 搜索区样式 */
+.search-section {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.form-group {
+  flex: 1;
+  min-width: 150px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.form-select,
+.form-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.form-select:focus,
+.form-input:focus {
+  outline: none;
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.date-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-separator {
+  color: #666;
+  font-size: 14px;
+}
+
+.search-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* 表格区样式 */
+.table-section {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.audit-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.audit-table th,
+.audit-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.audit-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+
+.audit-table td {
+  color: #666;
+}
+
+/* 操作类型标签样式 */
+.operation-type-tag {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+}
+
+.operation-type-tag.login {
+  background-color: #52c41a;
+}
+
+.operation-type-tag.create {
+  background-color: #1890ff;
+}
+
+.operation-type-tag.update {
+  background-color: #faad14;
+}
+
+.operation-type-tag.delete {
+  background-color: #f5222d;
+}
+
+.operation-type-tag.switch {
+  background-color: #722ed1;
+}
+
+.operation-type-tag.upload {
+  background-color: #13c2c2;
+}
+
+/* 分页样式 */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.page-info {
+  color: #666;
+  font-size: 14px;
+}
+
+.page-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.page-btn {
+  padding: 6px 12px;
+  border: 1px solid #d9d9d9;
+  background: white;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.page-btn:hover:not(:disabled) {
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 按钮样式 */
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background-color: #1890ff;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #40a9ff;
+}
+
+.btn:hover {
+  opacity: 0.9;
 }
 
 /* 响应式设计 */
