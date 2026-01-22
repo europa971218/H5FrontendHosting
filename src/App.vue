@@ -34,9 +34,9 @@ export default {
 }
 
 .header {
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  background-color: #282829;
   color: white;
-  padding: 1rem 2rem;
+  padding: 0.5rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
