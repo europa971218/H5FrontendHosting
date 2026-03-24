@@ -120,7 +120,7 @@ const platformMonitoring = {
 };
 
 // 获取数据概览
-router.get('/overview', authMiddleware, (req, res) => {
+router.get('/overview', (req, res) => {
   const { type } = req.query;
   
   res.json({
@@ -135,7 +135,7 @@ router.get('/overview', authMiddleware, (req, res) => {
 });
 
 // 获取资源使用数据
-router.get('/resource', authMiddleware, (req, res) => {
+router.get('/resource', (req, res) => {
   res.json({
     success: true,
     data: resourceUsage
@@ -143,7 +143,7 @@ router.get('/resource', authMiddleware, (req, res) => {
 });
 
 // 获取应用统计趋势
-router.get('/trend', authMiddleware, (req, res) => {
+router.get('/trend', (req, res) => {
   const { metric, startDate, endDate } = req.query;
   
   // 根据请求的指标返回对应趋势数据
@@ -169,7 +169,7 @@ router.get('/trend', authMiddleware, (req, res) => {
 });
 
 // 获取应用部署排名
-router.get('/deployment-rank', authMiddleware, (req, res) => {
+router.get('/deployment-rank', (req, res) => {
   const { limit = 30 } = req.query;
   
   res.json({
@@ -180,7 +180,7 @@ router.get('/deployment-rank', authMiddleware, (req, res) => {
 });
 
 // 获取应用包大小排名
-router.get('/package-size-rank', authMiddleware, (req, res) => {
+router.get('/package-size-rank', (req, res) => {
   res.json({
     success: true,
     data: packageSizeRank,

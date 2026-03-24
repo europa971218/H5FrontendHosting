@@ -30,6 +30,7 @@
 // 导入组件
 import LoginForm from '../components/LoginForm.vue'
 import TenantDialog from '../components/TenantDialog.vue'
+import { ElMessage } from 'element-plus'
 
 export default {
   name: 'Login',
@@ -37,6 +38,9 @@ export default {
   components: {
     LoginForm,
     TenantDialog
+  },
+  methods: {
+    $message: ElMessage
   },
   data() {
     return {

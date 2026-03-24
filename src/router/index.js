@@ -12,6 +12,7 @@ import Settings from '../views/Settings.vue'
 import AppOverview from '../views/AppOverview.vue'
 import LinkManagement from '../views/LinkManagement.vue'
 import Audit from '../views/Audit.vue'
+import AppKanban from '../views/AppKanban.vue'
 
 const routes = [
   {
@@ -87,6 +88,11 @@ const routes = [
     path: '/operation-audit',
     name: 'OperationAudit',
     component: DataOverview
+  },
+  {
+    path: '/app-kanban',
+    name: 'AppKanban',
+    component: AppKanban
   }
 ]
 

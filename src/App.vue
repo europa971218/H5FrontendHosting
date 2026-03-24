@@ -3,19 +3,39 @@
     <!-- 登录页面不显示公共导航 -->
     <template v-if="$route.name !== 'Login'">
       <header class="header">
-        <h1 class="logo">银行H5</h1>
-        <nav class="nav">
-          <router-link to="/home">首页</router-link>
-          <router-link to="/accounts">账户</router-link>
-          <router-link to="/transactions">交易</router-link>
-          <router-link to="/services">服务</router-link>
-          <router-link to="/audit">操作审计</router-link>
-        </nav>
-        <div class="user-menu">
-          <div class="user-avatar" @click="toggleUserMenu">
-            <img :src="userAvatar" alt="用户头像" class="avatar-img">
-          </div>
-          <div v-if="showUserMenu" class="dropdown-menu">
+        <h1 class="logo">广东农信 悦农H5应用集中托管系统</h1>
+        <div class="nav-container">
+          <nav class="nav">
+            <router-link to="/home" class="nav-item">
+              <font-awesome-icon icon="compass" class="nav-icon" />
+              <span class="nav-text">导引</span>
+            </router-link>
+            <router-link to="/accounts" class="nav-item">
+              <font-awesome-icon icon="comment" class="nav-icon" />
+              <span class="nav-text">用户建议</span>
+            </router-link>
+            <router-link to="/transactions" class="nav-item">
+              <font-awesome-icon icon="desktop" class="nav-icon" />
+              <span class="nav-text">工作台</span>
+            </router-link>
+            <router-link to="/services" class="nav-item">
+              <font-awesome-icon icon="question-circle" class="nav-icon" />
+              <span class="nav-text">帮助中心</span>
+            </router-link>
+            <router-link to="/audit" class="nav-item">
+              <font-awesome-icon icon="code" class="nav-icon" />
+              <span class="nav-text">开发者门户</span>
+            </router-link>
+            <router-link to="/app-kanban" class="nav-item">
+              <font-awesome-icon icon="th-large" class="nav-icon" />
+              <span class="nav-text">应用看板</span>
+            </router-link>
+          </nav>
+          <div class="user-menu">
+            <div class="user-avatar" @click="toggleUserMenu">
+              <img :src="userAvatar" alt="用户头像" class="avatar-img">
+            </div>
+            <div v-if="showUserMenu" class="dropdown-menu">
             <!-- 用户信息部分 -->
             <div class="user-info-section">
               <div class="user-header">
@@ -60,6 +80,7 @@
               </a>
             </div>
           </div>
+        </div>
         </div>
       </header>
       <!-- 显示路由内容 -->
@@ -145,9 +166,9 @@ export default {
 }
 
 .header {
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  background-color: #272829;
   color: white;
-  padding: 1rem 2rem;
+  padding: 0.75rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -155,30 +176,55 @@ export default {
 }
 
 .logo {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: bold;
   margin: 0;
+  white-space: nowrap;
+  color: #dbdadc;
+}
+
+.nav-container {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
 }
 
 .nav {
   display: flex;
-  gap: 1.5rem;
+  gap: 0.8rem;
+  margin-right: 0.8rem;
 }
 
-.nav a {
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   color: white;
   text-decoration: none;
   font-weight: 500;
-  transition: opacity 0.2s;
+  transition: all 0.2s;
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
 }
 
-.nav a:hover {
-  opacity: 0.8;
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-icon {
+  font-size: 1rem;
+  width: 16px;
+  text-align: center;
+}
+
+.nav-text {
+  font-size: 0.9rem;
 }
 
 .user-menu {
-  margin-left: auto;
   position: relative;
+  display: inline-block;
 }
 
 .user-avatar {
@@ -191,6 +237,10 @@ export default {
   border: 2px solid white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .user-avatar:hover {
@@ -215,6 +265,10 @@ export default {
   min-width: 280px;
   z-index: 1000;
   border: 1px solid #e5e7eb;
+  display: block;
+  transition: opacity 0.2s, transform 0.2s;
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* 用户信息部分 */
