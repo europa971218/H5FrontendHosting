@@ -30,6 +30,10 @@
               <font-awesome-icon icon="th-large" class="nav-icon" />
               <span class="nav-text">应用看板</span>
             </router-link>
+            <router-link to="/version-management" class="nav-item">
+              <font-awesome-icon icon="code-branch" class="nav-icon" />
+              <span class="nav-text">版本管理</span>
+            </router-link>
           </nav>
           <div class="user-menu">
             <div class="user-avatar" @click="toggleUserMenu">

@@ -13,6 +13,7 @@ import AppOverview from '../views/AppOverview.vue'
 import LinkManagement from '../views/LinkManagement.vue'
 import Audit from '../views/Audit.vue'
 import AppKanban from '../views/AppKanban.vue'
+import VersionManagement from '../views/VersionManagement.vue'
 
 const routes = [
   {
@@ -93,6 +94,11 @@ const routes = [
     path: '/app-kanban',
     name: 'AppKanban',
     component: AppKanban
+  },
+  {
+    path: '/version-management',
+    name: 'VersionManagement',
+    component: VersionManagement
   }
 ]
 

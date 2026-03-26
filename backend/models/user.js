@@ -22,7 +22,7 @@ const users = [
   new User(
     '1',
     'caohan',
-    bcrypt.hashSync('4321·', 10), // 密码：sysadmin123
+    bcrypt.hashSync('4321', 10), // 密码：sysadmin123
     ROLES.SYSADMIN,
     null,
     'sysadmin@example.com'

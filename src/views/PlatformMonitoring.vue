@@ -3,6 +3,7 @@
     <!-- 顶部导航栏 -->
     <header class="top-nav">
       <div class="nav-tabs">
+        <router-link to="/applications" class="tab">应用管理</router-link>
         <router-link to="/data-overview" class="tab">数据概览</router-link>
         <router-link to="/tenant-management" class="tab">租户管理</router-link>
         <router-link to="/user-management" class="tab">用户管理</router-link>

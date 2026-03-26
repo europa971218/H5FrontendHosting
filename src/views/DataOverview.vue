@@ -3,6 +3,7 @@
     <!-- 顶部导航栏 -->
     <header class="top-nav">
       <div class="nav-tabs">
+        <router-link to="/applications" class="tab" :class="{ active: $route.path === '/applications' }">应用管理</router-link>
         <router-link to="/data-overview" class="tab" :class="{ active: $route.path === '/data-overview' }">数据概览</router-link>
         <router-link to="/tenant-management" class="tab">租户管理</router-link>
         <router-link to="/user-management" class="tab">用户管理</router-link>
@@ -184,6 +185,9 @@
         <h2><font-awesome-icon icon="chart-line" /> 数据概览</h2>
         <!-- 新增导航 -->
         <div class="data-nav">
+          <span class="nav-item" :class="{ active: activeNav === '应用管理' }" @click="switchNav('应用管理')" v-wave>
+            <font-awesome-icon icon="th-large" /> 应用管理
+          </span>
           <span class="nav-item" :class="{ active: activeNav === '应用运营' }" @click="switchNav('应用运营')" v-wave>
             <font-awesome-icon icon="cubes" /> 应用运营
           </span>
@@ -501,7 +505,123 @@
           </div>
         </div>
       </div>
+      
+      <!-- 应用管理内容 -->
+      <div v-else-if="activeNav === '应用管理'">
+        <!-- 应用管理标题 -->
+        <div class="stat-type">
+          <button class="stat-btn" :class="{ active: activeStatType4 === '月度统计' }" @click="changeStatType(4, '月度统计')">月度统计</button>
+          <button class="stat-btn" :class="{ active: activeStatType4 === '季度统计' }" @click="changeStatType(4, '季度统计')">季度统计</button>
+          <div class="filter-group" style="margin-left: auto;">
+            <label>统计周期</label>
+            <el-date-picker
+              v-model="dateRange4"
+              type="daterange"
+              range-separator=" - "
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              format="YYYY-MM"
+              value-format="YYYY-MM"
+              style="width: 200px"
+            />
+          </div>
+        </div>
 
+        <!-- 应用管理内容 -->
+        <div class="card">
+          <h3>应用列表</h3>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>应用ID</th>
+                  <th>应用名称</th>
+                  <th>租户</th>
+                  <th>状态</th>
+                  <th>部署次数</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1,906,877,333,060,034,561</td>
+                  <td>电子管理平台 web 端</td>
+                  <td>租户1</td>
+                  <td><span class="status-tag active">运行中</span></td>
+                  <td>19</td>
+                  <td>
+                    <button class="btn btn-sm">查看</button>
+                    <button class="btn btn-sm">编辑</button>
+                    <button class="btn btn-sm">部署</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>1,914,260,039,585,026,049</td>
+                  <td>代发薪-企业端</td>
+                  <td>租户2</td>
+                  <td><span class="status-tag active">运行中</span></td>
+                  <td>15</td>
+                  <td>
+                    <button class="btn btn-sm">查看</button>
+                    <button class="btn btn-sm">编辑</button>
+                    <button class="btn btn-sm">部署</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>1,928,369,597,602,971,650</td>
+                  <td>代发薪-企业端（内网）</td>
+                  <td>租户2</td>
+                  <td><span class="status-tag active">运行中</span></td>
+                  <td>9</td>
+                  <td>
+                    <button class="btn btn-sm">查看</button>
+                    <button class="btn btn-sm">编辑</button>
+                    <button class="btn btn-sm">部署</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>1,978,291,280,274,882,561</td>
+                  <td>共享1016应用</td>
+                  <td>租户1</td>
+                  <td><span class="status-tag inactive">已停止</span></td>
+                  <td>10</td>
+                  <td>
+                    <button class="btn btn-sm">查看</button>
+                    <button class="btn btn-sm">编辑</button>
+                    <button class="btn btn-sm">部署</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>1,978,291,103,929,565,186</td>
+                  <td>隔离1016应用</td>
+                  <td>租户3</td>
+                  <td><span class="status-tag active">运行中</span></td>
+                  <td>7</td>
+                  <td>
+                    <button class="btn btn-sm">查看</button>
+                    <button class="btn btn-sm">编辑</button>
+                    <button class="btn btn-sm">部署</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 应用部署统计 -->
+        <div class="charts-row">
+          <div class="chart-card">
+            <h3>应用部署趋势</h3>
+            <div class="chart-container" ref="appDeploymentChart"></div>
+          </div>
+
+          <div class="chart-card">
+            <h3>应用状态分布</h3>
+            <div class="chart-container" ref="appStatusChart"></div>
+          </div>
+        </div>
+      </div>
+      
       <!-- 资源使用内容 -->
       <div v-else-if="activeNav === '资源使用'">
         <!-- 统计类型切换 -->
@@ -701,10 +821,12 @@ export default {
       dateRange1: ['2025-05', '2025-06'], // 应用运营月度
       dateRange2: ['2025-12', '2026-01'], // 应用运营请求/部署月度
       dateRange3: ['2025-11', '2026-01'], // 资源使用月度
+      dateRange4: ['2025-12', '2026-01'], // 应用管理月度
       // 统计类型：月度统计/季度统计
       activeStatType1: '月度统计', // 应用运营统计类型
       activeStatType2: '月度统计', // 应用运营请求/部署统计类型
       activeStatType3: '月度统计', // 资源使用统计类型
+      activeStatType4: '月度统计', // 应用管理统计类型
       // 当前激活的导航项
       activeNav: '应用运营',
       // 后端数据
@@ -955,6 +1077,25 @@ export default {
           isQuarterly ? ['2025-Q4', '2026-Q1'] : resourceUsage.trend.map(item => item.time),
           isQuarterly ? [15000, 5000] : resourceUsage.trend.map(item => item.memory ? item.memory * 1000 : 0),
           '平台告警次数'
+        )
+      } else if (this.activeNav === '应用管理') {
+        // 获取当前统计类型
+        const isQuarterly = this.activeStatType4 === '季度统计'
+        
+        // 应用部署趋势 - 折线图
+        this.charts.appDeployment = this.initLineChart(
+          this.$refs.appDeploymentChart,
+          isQuarterly ? ['2025-Q4', '2026-Q1'] : ['2025-12', '2026-01'],
+          isQuarterly ? [150, 200] : [187, 203],
+          '应用部署趋势'
+        )
+
+        // 应用状态分布 - 饼图
+        this.charts.appStatus = this.initPieChart(
+          this.$refs.appStatusChart,
+          ['运行中', '已停止', '部署中', '异常'],
+          [65, 20, 10, 5],
+          '应用状态分布'
         )
       }
     },
@@ -1264,6 +1405,55 @@ export default {
       return chart
     },
 
+    // 初始化饼图
+    initPieChart(dom, categories, data, title) {
+      const chart = echarts.init(dom)
+      const option = {
+        title: {
+          text: '',
+          left: 'center'
+        },
+        tooltip: {
+          trigger: 'item',
+          formatter: '{a} <br/>{b}: {c} ({d}%)'
+        },
+        legend: {
+          orient: 'vertical',
+          left: 'left',
+          textStyle: {
+            color: '#666'
+          }
+        },
+        series: [
+          {
+            name: title,
+            type: 'pie',
+            radius: '60%',
+            center: ['50%', '50%'],
+            data: categories.map((category, index) => ({
+              value: data[index],
+              name: category
+            })),
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
+              }
+            },
+            itemStyle: {
+              color: function(params) {
+                const colors = ['#67c23a', '#e6a23c', '#409eff', '#f56c6c']
+                return colors[params.dataIndex]
+              }
+            }
+          }
+        ]
+      }
+      chart.setOption(option)
+      return chart
+    },
+
     // 切换导航
     switchNav(nav) {
       this.activeNav = nav
@@ -1274,38 +1464,44 @@ export default {
     },
 
     // 切换统计类型
-    changeStatType(statTypeIndex, statType) {
-      // 更新对应的统计类型状态
-      if (statTypeIndex === 1) {
-        this.activeStatType1 = statType
-      } else if (statTypeIndex === 2) {
-        this.activeStatType2 = statType
-      } else if (statTypeIndex === 3) {
-        this.activeStatType3 = statType
-      }
-
-      // 根据统计类型更新对应的日期范围
-      if (statType === '季度统计') {
+      changeStatType(statTypeIndex, statType) {
+        // 更新对应的统计类型状态
         if (statTypeIndex === 1) {
-          this.dateRange1 = ['2025-Q2', '2025-Q3']
+          this.activeStatType1 = statType
         } else if (statTypeIndex === 2) {
-          this.dateRange2 = ['2025-Q4', '2026-Q1']
+          this.activeStatType2 = statType
         } else if (statTypeIndex === 3) {
-          this.dateRange3 = ['2025-Q4', '2026-Q1']
+          this.activeStatType3 = statType
+        } else if (statTypeIndex === 4) {
+          this.activeStatType4 = statType
         }
-      } else {
-        if (statTypeIndex === 1) {
-          this.dateRange1 = ['2025-05', '2025-06']
-        } else if (statTypeIndex === 2) {
-          this.dateRange2 = ['2025-12', '2026-01']
-        } else if (statTypeIndex === 3) {
-          this.dateRange3 = ['2025-11', '2026-01']
-        }
-      }
 
-      // 重新初始化图表，更新数据
-      this.initCharts()
-    },
+        // 根据统计类型更新对应的日期范围
+        if (statType === '季度统计') {
+          if (statTypeIndex === 1) {
+            this.dateRange1 = ['2025-Q2', '2025-Q3']
+          } else if (statTypeIndex === 2) {
+            this.dateRange2 = ['2025-Q4', '2026-Q1']
+          } else if (statTypeIndex === 3) {
+            this.dateRange3 = ['2025-Q4', '2026-Q1']
+          } else if (statTypeIndex === 4) {
+            this.dateRange4 = ['2025-Q4', '2026-Q1']
+          }
+        } else {
+          if (statTypeIndex === 1) {
+            this.dateRange1 = ['2025-05', '2025-06']
+          } else if (statTypeIndex === 2) {
+            this.dateRange2 = ['2025-12', '2026-01']
+          } else if (statTypeIndex === 3) {
+            this.dateRange3 = ['2025-11', '2026-01']
+          } else if (statTypeIndex === 4) {
+            this.dateRange4 = ['2025-12', '2026-01']
+          }
+        }
+
+        // 重新初始化图表，更新数据
+        this.initCharts()
+      },
 
     // 调整所有图表大小
     resizeCharts() {
@@ -1722,6 +1918,49 @@ export default {
 
 .grid-line span {
   margin-right: 10px;
+}
+
+/* 状态标签样式 */
+.status-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-tag.active {
+  background-color: #f0f9eb;
+  color: #67c23a;
+  border: 1px solid #c2e7b0;
+}
+
+.status-tag.inactive {
+  background-color: #fef0f0;
+  color: #f56c6c;
+  border: 1px solid #fbc4c4;
+}
+
+/* 按钮样式 */
+.btn {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  background-color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-right: 5px;
+}
+
+.btn:hover {
+  border-color: #1e3c72;
+  color: #1e3c72;
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 11px;
 }
 
 /* 卡片样式 */
