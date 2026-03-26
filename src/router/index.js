@@ -139,6 +139,11 @@ const routes = [
     path: '/monitoring-management',
     name: 'MonitoringManagement',
     component: Home
+  },
+  {
+    path: '/security-management',
+    name: 'SecurityManagement',
+    component: Home
   }
 ]
 

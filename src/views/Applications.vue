@@ -203,11 +203,57 @@ export default {
       this.initCharts()
     },
     // 初始化图表
-    initCharts() {
+    async initCharts() {
       // 清理现有的图表实例
       Object.values(this.charts).forEach(chart => chart.dispose())
       this.charts = {}
 
+      try {
+        // 从后端API获取图表数据
+        const token = localStorage.getItem('token')
+        const response = await fetch(`http://localhost:3005/api/data/app-charts?statType=${this.activeStatType}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (token || 'test-token')
+          }
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          const chartData = data.data
+          
+          // 应用部署趋势 - 折线图
+          if (this.$refs.appDeploymentChart) {
+            this.charts.appDeployment = this.initLineChart(
+              this.$refs.appDeploymentChart,
+              chartData.deploymentTrend.categories,
+              chartData.deploymentTrend.data,
+              '应用部署趋势'
+            )
+          }
+
+          // 应用状态分布 - 饼图
+          if (this.$refs.appStatusChart) {
+            this.charts.appStatus = this.initPieChart(
+              this.$refs.appStatusChart,
+              chartData.statusDistribution.categories,
+              chartData.statusDistribution.data,
+              '应用状态分布'
+            )
+          }
+        } else {
+          console.error('Failed to load chart data:', response.statusText)
+          // 加载失败时使用默认数据
+          this.loadDefaultChartData()
+        }
+      } catch (error) {
+        console.error('Error loading chart data:', error)
+        // 加载失败时使用默认数据
+        this.loadDefaultChartData()
+      }
+    },
+    // 加载默认图表数据
+    loadDefaultChartData() {
       // 获取当前统计类型
       const isQuarterly = this.activeStatType === '季度统计'
       
@@ -379,20 +425,7 @@ export default {
         this.appSortField = field
         this.appSortOrder = 'asc'
       }
-    }
-  },
-  mounted() {
-    // 设置JWT令牌到localStorage
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImNhb2hhbiIsInJvbGUiOiJzeXNhZG1pbiIsInRlbmFudElkIjpudWxsLCJpYXQiOjE3NzQ0OTYzNDIsImV4cCI6MTc3NDQ5OTk0Mn0.l4ON3KGnuXeQm5_VjOUqGST-VIJzVozjzYNRKPi9qpw'
-    localStorage.setItem('token', token)
-    console.log('Token set to localStorage:', token)
-    
-    this.loadApplications()
-    this.initCharts()
-    // 监听窗口大小变化，自动调整图表大小
-    window.addEventListener('resize', this.resizeCharts)
-  },
-  methods: {
+    },
     async loadApplications() {
       this.loading = true
       try {
@@ -413,18 +446,18 @@ export default {
           const data = await response.json()
           console.log('Loaded applications:', data)
           this.appData = data.map(app => ({
-            tenant: app.tenantId,
+            tenant: app.tenant,
             productLine: app.productLine,
             product: app.product,
             name: app.appName,
             id: app.appId,
-            createTime: new Date(app.createdAt).toLocaleDateString(),
+            createTime: app.createdAt,
             owner: app.responsiblePerson,
             type: app.userType,
             accessType: app.accessType,
             purpose: this.getAppPurpose(app),
-            status: (app.testEnv === '已移入' && app.productionEnv === '已移入') ? '已接入' : '未接入',
-            statusClass: (app.testEnv === '已移入' && app.productionEnv === '已移入') ? 'active' : 'inactive'
+            status: (app.testEnv === '测试应用' && app.productionEnv === '已接入') ? '已接入' : '未接入',
+            statusClass: (app.testEnv === '测试应用' && app.productionEnv === '已接入') ? 'active' : 'inactive'
           }))
         } else {
           console.error('Failed to load applications:', response.statusText)
@@ -435,12 +468,233 @@ export default {
           } catch (e) {
             console.error('Failed to parse error response:', e)
           }
+          // 使用假数据
+          this.loadMockData()
         }
       } catch (error) {
         console.error('Error loading applications:', error)
+        // 使用假数据
+        this.loadMockData()
       } finally {
         this.loading = false
       }
+    },
+    // 加载假数据
+    loadMockData() {
+      console.log('Loading mock data...')
+      this.appData = [
+        {
+          tenant: '广东农信',
+          productLine: '线上渠道',
+          product: '悦农生活',
+          name: '悦农生活-用户端',
+          id: '1813698530151777920',
+          createTime: '2026/7/30',
+          owner: '张秀玲',
+          type: 'H5',
+          accessType: '外网访问',
+          purpose: '测试应用',
+          status: '已接入',
+          statusClass: 'active'
+        },
+        {
+          tenant: '广东农信',
+          productLine: '线上渠道',
+          product: '悦农生活',
+          name: '悦农生活-运营端',
+          id: '1783645480206766651',
+          createTime: '2026/7/30',
+          owner: '卢易',
+          type: 'PC',
+          accessType: '内网访问',
+          purpose: '测试应用',
+          status: '已接入',
+          statusClass: 'active'
+        },
+        {
+          tenant: '广东农信',
+          productLine: '线上渠道',
+          product: '悦农生活',
+          name: '悦农生活-云客端C',
+          id: '1791926466971801089',
+          createTime: '2026/7/30',
+          owner: '户建谋',
+          type: 'PC',
+          accessType: '外网访问',
+          purpose: '测试应用',
+          status: '已接入',
+          statusClass: 'active'
+        },
+        {
+          tenant: '广东农信',
+          productLine: '线上渠道',
+          product: '悦农生活',
+          name: '悦农生活-用户端h5',
+          id: '1987385317170558873',
+          createTime: '2026/7/30',
+          owner: '户建谋',
+          type: 'H5',
+          accessType: '外网访问',
+          purpose: '测试应用',
+          status: '已接入',
+          statusClass: 'active'
+        },
+        {
+          tenant: '广东农信',
+          productLine: '线上渠道',
+          product: '悦农生活',
+          name: '缴费应用户端',
+          id: '1784871258674894657',
+          createTime: '2026/7/30',
+          owner: '苏欣悦',
+          type: 'H5',
+          accessType: '外网访问',
+          purpose: '测试应用',
+          status: '已接入',
+          statusClass: 'active'
+        },
+        {
+          tenant: '广东农信',
+          productLine: '线上渠道',
+          product: '统一用户',
+          name: '统一用户端-临时',
+          id: '1784773501246697867',
+          createTime: '2026/7/30',
+          owner: '张秀玲',
+          type: 'PC',
+          accessType: '外网访问',
+          purpose: '测试应用',
+          status: '已接入',
+          statusClass: 'active'
+        },
+        {
+          tenant: '广东农信',
+          productLine: '线上渠道',
+          product: '统一用户',
+          name: '统一用户中心-PC',
+          id: '1783417173685864625',
+          createTime: '2026/7/30',
+          owner: '江泰秀',
+          type: 'PC',
+          accessType: '外网访问',
+          purpose: '测试应用',
+          status: '已接入',
+          statusClass: 'active'
+        },
+        {
+          tenant: '广东农信',
+          productLine: '线上渠道',
+          product: '统一用户',
+          name: '安全中心（H5）',
+          id: '1785789425946532560',
+          createTime: '2026/7/30',
+          owner: '张秀玲',
+          type: 'H5',
+          accessType: '外网访问',
+          purpose: '测试应用',
+          status: '已接入',
+          statusClass: 'active'
+        },
+        {
+          tenant: '广东农信',
+          productLine: '线上渠道',
+          product: '悦农缴费',
+          name: '综合积分管理',
+          id: '1817695719748698281',
+          createTime: '2026/7/30',
+          owner: '杨丹丹',
+          type: 'PC',
+          accessType: '内网访问',
+          purpose: '测试应用',
+          status: '已接入',
+          statusClass: 'active'
+        },
+        {
+          tenant: '广东农信',
+          productLine: '线上渠道',
+          product: '悦农缴费',
+          name: '悦农缴费管理端',
+          id: '1789113739211191761',
+          createTime: '2026/7/30',
+          owner: '李素静',
+          type: 'PC',
+          accessType: '内网访问',
+          purpose: '测试应用',
+          status: '已接入',
+          statusClass: 'active'
+        },
+        {
+          tenant: '广东农信',
+          productLine: '线上渠道',
+          product: '悦农缴费',
+          name: '悦农缴费用户端',
+          id: '1786838721811027250',
+          createTime: '2026/7/30',
+          owner: '李素静',
+          type: 'H5',
+          accessType: '外网访问',
+          purpose: '测试应用',
+          status: '已接入',
+          statusClass: 'active'
+        },
+        {
+          tenant: '广东农信',
+          productLine: '其他',
+          product: '业务运营门户',
+          name: '业务运营门户',
+          id: '1772829105565859646',
+          createTime: '2026/7/30',
+          owner: '万建雄',
+          type: 'PC',
+          accessType: '内网访问',
+          purpose: '测试应用',
+          status: '已接入',
+          statusClass: 'active'
+        },
+        {
+          tenant: '广东农信',
+          productLine: '其他',
+          product: '业务运营门户',
+          name: '业务运营门户-前端',
+          id: '1792409042847563933',
+          createTime: '2026/7/30',
+          owner: '万建雄',
+          type: 'PC',
+          accessType: '内网访问',
+          purpose: '测试应用',
+          status: '已接入',
+          statusClass: 'active'
+        },
+        {
+          tenant: '广东农信',
+          productLine: '其他',
+          product: '业务运营门户',
+          name: '政务平台前端-省创',
+          id: '1792426413440297654',
+          createTime: '2026/7/30',
+          owner: '陈雄健',
+          type: 'PC',
+          accessType: '内网访问',
+          purpose: '测试应用',
+          status: '已接入',
+          statusClass: 'active'
+        },
+        {
+          tenant: '广东农信',
+          productLine: '其他',
+          product: '工具产品',
+          name: '钉钉一代工具',
+          id: '1981457575515126724',
+          createTime: '2026/7/30',
+          owner: '张秋健',
+          type: 'PC',
+          accessType: '内网访问',
+          purpose: '测试应用',
+          status: '已接入',
+          statusClass: 'active'
+        }
+      ]
+      console.log('Mock data loaded:', this.appData)
     },
     getAppPurpose(app) {
       // 根据应用类型和业务区域判断用途
@@ -452,6 +706,14 @@ export default {
         return '企业管理'
       }
     }
+  },
+  mounted() {
+    // 加载应用数据
+    this.loadApplications()
+    // 初始化图表
+    this.initCharts()
+    // 添加窗口大小变化监听
+    window.addEventListener('resize', this.resizeCharts)
   },
   beforeUnmount() {
     // 清理图表实例

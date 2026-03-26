@@ -96,7 +96,6 @@
             <router-link to="/tenant-management" class="tab" :class="{ active: $route.path === '/tenant-management' }">租户管理</router-link>
             <router-link to="/user-management" class="tab" :class="{ active: $route.path === '/user-management' }">用户管理</router-link>
             <router-link to="/organization-management" class="tab" :class="{ active: $route.path === '/organization-management' }">机构管理</router-link>
-            <router-link to="/hosting" class="tab" :class="{ active: $route.path === '/hosting' }">托管管理</router-link>
             <router-link to="/platform-monitoring" class="tab" :class="{ active: $route.path === '/platform-monitoring' }">平台监控</router-link>
             <router-link to="/alert-center" class="tab" :class="{ active: $route.path === '/alert-center' }">告警中心</router-link>
             <router-link to="/platform-logs" class="tab" :class="{ active: $route.path === '/platform-logs' }">平台日志</router-link>
@@ -105,6 +104,7 @@
             <router-link to="/help-center" class="tab" :class="{ active: $route.path === '/help-center' }">帮助中心</router-link>
             <router-link to="/monitoring-management" class="tab" :class="{ active: $route.path === '/monitoring-management' }">监控管理</router-link>
             <router-link to="/version-management" class="tab" :class="{ active: $route.path === '/version-management' }">版本管理</router-link>
+            <router-link to="/security-management" class="tab" :class="{ active: $route.path === '/security-management' }">安全管理</router-link>
           </div>
       </nav>
       <!-- 显示路由内容 -->
@@ -203,21 +203,25 @@ export default {
 .main-nav {
   background-color: white;
   border-bottom: 1px solid #e0e0e0;
-  padding: 0 2rem;
+  padding: 0 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
 }
 
 .nav-tabs {
   display: flex;
-  gap: 10px;
-  padding: 12px 0;
+  gap: 8px;
+  padding: 10px 0;
   justify-content: flex-start;
   align-items: center;
+  min-width: max-content;
 }
 
 .tab {
-  padding: 8px 14px;
-  font-size: 0.8rem;
+  padding: 6px 10px;
+  font-size: 0.75rem;
   color: #666;
   cursor: pointer;
   border-radius: 4px;

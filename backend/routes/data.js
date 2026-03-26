@@ -188,4 +188,29 @@ router.get('/package-size-rank', (req, res) => {
   });
 });
 
+// 获取应用图表数据
+router.get('/app-charts', authMiddleware, (req, res) => {
+  const { statType = '月度统计', startDate, endDate } = req.query;
+  
+  // 应用部署趋势数据
+  const deploymentTrend = {
+    categories: statType === '季度统计' ? ['2025-Q4', '2026-Q1'] : ['2025-12', '2026-01'],
+    data: statType === '季度统计' ? [150, 200] : [187, 203]
+  };
+  
+  // 应用状态分布数据
+  const statusDistribution = {
+    categories: ['运行中', '已停止', '部署中', '异常'],
+    data: [65, 20, 10, 5]
+  };
+  
+  res.json({
+    success: true,
+    data: {
+      deploymentTrend,
+      statusDistribution
+    }
+  });
+});
+
 module.exports = router;

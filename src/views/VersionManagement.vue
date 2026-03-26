@@ -1,136 +1,52 @@
 <template>
   <div class="version-management">
-    <!-- 页面标题 -->
-    <h1 class="page-title">版本管理</h1>
-    
-    <!-- 搜索和筛选区域 -->
-    <div class="search-filter">
-      <div class="filter-item">
-        <label>应用系统</label>
-        <select v-model="filters.appSystem" class="form-select">
-          <option value="">全部</option>
-          <option value="应用发布系统">应用发布系统</option>
-          <option value="应用发布管理系统">应用发布管理系统</option>
-          <option value="餐饮系统">餐饮系统</option>
-          <option value="业务运营门户">业务运营门户</option>
-          <option value="HS开发新门户">HS开发新门户</option>
-        </select>
+    <!-- 标签页组件 -->
+    <div class="tab-container">
+      <div class="version-tabs">
+        <button 
+          class="version-tab" 
+          :class="{ active: activeTab === 'versionList' }" 
+          @click="activeTab = 'versionList'"
+        >
+          版本列表
+        </button>
+        <button 
+          class="version-tab" 
+          :class="{ active: activeTab === 'deploymentData' }" 
+          @click="activeTab = 'deploymentData'"
+        >
+          部署发布数据
+        </button>
       </div>
-      
-      <div class="filter-item">
-        <label>环境</label>
-        <select v-model="filters.environment" class="form-select">
-          <option value="">全部</option>
-          <option value="sit">sit</option>
-          <option value="prod">prod</option>
-        </select>
+
+      <!-- 版本列表标签页内容 -->
+      <div v-if="activeTab === 'versionList'" class="tab-content">
+        <SearchFilterTable :data="versionData" />
       </div>
-      
-      <div class="filter-item">
-        <label>MD5值</label>
-        <input type="text" v-model="filters.md5" placeholder="请输入MD5" class="form-input">
-      </div>
-      
-      <div class="filter-item">
-        <label>版本上传时间范围</label>
-        <input type="date" v-model="filters.dateRange" class="form-input">
-      </div>
-      
-      <div class="filter-item">
-        <label>分片 ID</label>
-        <select v-model="filters.shardId" class="form-select">
-          <option value="">全部</option>
-          <option value="1">1</option>
-        </select>
-      </div>
-      
-      <div class="filter-item">
-        <label>状态</label>
-        <select v-model="filters.status" class="form-select">
-          <option value="">全部</option>
-        </select>
-      </div>
-      
-      <div class="filter-item">
-        <label>结果范围</label>
-        <select v-model="filters.resultRange" class="form-select">
-          <option value="">全部</option>
-        </select>
-      </div>
-      
-      <button class="search-btn">查询</button>
-    </div>
-    
-    <!-- 表格区域 -->
-    <div class="table-container">
-      <table class="version-table">
-        <thead>
-          <tr>
-            <th @click="sortBy('index')" class="sortable">
-              序号
-              <span v-if="sortField === 'index'" class="sort-icon">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
-            </th>
-            <th @click="sortBy('appName')" class="sortable">
-              应用名称
-              <span v-if="sortField === 'appName'" class="sort-icon">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
-            </th>
-            <th @click="sortBy('uploader')" class="sortable">
-              上传人
-              <span v-if="sortField === 'uploader'" class="sort-icon">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
-            </th>
-            <th @click="sortBy('environment')" class="sortable">
-              环境
-              <span v-if="sortField === 'environment'" class="sort-icon">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
-            </th>
-            <th @click="sortBy('md5')" class="sortable">
-              MD5值
-              <span v-if="sortField === 'md5'" class="sort-icon">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
-            </th>
-            <th @click="sortBy('uploadTime')" class="sortable">
-              上传时间
-              <span v-if="sortField === 'uploadTime'" class="sort-icon">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in paginatedData" :key="index">
-            <td>{{ (currentPage - 1) * pageSize + index + 1 }}</td>
-            <td>{{ item.appName }}</td>
-            <td>{{ item.uploader }}</td>
-            <td>{{ item.environment }}</td>
-            <td>{{ item.md5 }}</td>
-            <td>{{ item.uploadTime }}</td>
-          </tr>
-        </tbody>
-      </table>
-      
-      <!-- 分页控件 -->
-      <div class="pagination">
-        <span class="page-info">{{ totalItems }}页/</span>
-        <div class="page-buttons">
-          <button @click="goToPage(1)" :disabled="currentPage === 1">首页</button>
-          <button 
-            v-for="page in pageRange" 
-            :key="page"
-            @click="goToPage(page)"
-            :class="{ active: page === currentPage }"
-          >
-            {{ page }}
-          </button>
-          <button @click="goToPage(totalPages)" :disabled="currentPage === totalPages">末页</button>
-        </div>
-        <span class="page-info">前往 1 页</span>
+
+      <!-- 部署发布数据标签页内容 -->
+      <div v-if="activeTab === 'deploymentData'" class="tab-content">
+        <DeployAndPublishDataList :data="deploymentData" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import SearchFilterTable from '../components/SearchFilterTable.vue'
+import DeployAndPublishDataList from '../components/deployAndPublishDataList.vue'
+
 export default {
   name: 'VersionManagement',
+  components: {
+    SearchFilterTable,
+    DeployAndPublishDataList
+  },
   data() {
     return {
-      // 模拟版本数据
+      // 激活的标签页
+      activeTab: 'versionList',
+      // 版本列表数据
       versionData: [
         {
           appName: '应用发布系统',
@@ -203,110 +119,264 @@ export default {
           uploadTime: '2025-11-18 10:59:59'
         }
       ],
-      filters: {
-        appSystem: '',
-        environment: '',
-        md5: '',
-        dateRange: '',
-        shardId: '',
-        status: '',
-        resultRange: ''
-      },
-      sortField: '',
-      sortOrder: 'asc',
-      currentPage: 1,
-      pageSize: 10
-    }
-  },
-  computed: {
-    // 计算总页数
-    totalPages() {
-      return Math.ceil(this.filteredData.length / this.pageSize)
-    },
-    // 计算总项目数
-    totalItems() {
-      return this.filteredData.length
-    },
-    // 过滤后的数据
-    filteredData() {
-      let filtered = [...this.versionData]
-      
-      // 应用系统过滤
-      if (this.filters.appSystem) {
-        filtered = filtered.filter(item => item.appName.includes(this.filters.appSystem))
-      }
-      
-      // 环境过滤
-      if (this.filters.environment) {
-        filtered = filtered.filter(item => item.environment === this.filters.environment)
-      }
-      
-      // MD5过滤
-      if (this.filters.md5) {
-        filtered = filtered.filter(item => item.md5.includes(this.filters.md5))
-      }
-      
-      // 排序
-      if (this.sortField) {
-        filtered.sort((a, b) => {
-          let valueA = a[this.sortField]
-          let valueB = b[this.sortField]
-          
-          if (this.sortField === 'uploadTime') {
-            valueA = new Date(valueA)
-            valueB = new Date(valueB)
-          }
-          
-          if (valueA < valueB) {
-            return this.sortOrder === 'asc' ? -1 : 1
-          }
-          if (valueA > valueB) {
-            return this.sortOrder === 'asc' ? 1 : -1
-          }
-          return 0
-        })
-      }
-      
-      return filtered
-    },
-    // 分页后的数据
-    paginatedData() {
-      const startIndex = (this.currentPage - 1) * this.pageSize
-      const endIndex = startIndex + this.pageSize
-      return this.filteredData.slice(startIndex, endIndex)
-    },
-    // 分页按钮范围
-    pageRange() {
-      const range = []
-      const total = this.totalPages
-      const current = this.currentPage
-      
-      // 显示当前页附近的页码
-      const start = Math.max(1, current - 2)
-      const end = Math.min(total, start + 4)
-      
-      for (let i = start; i <= end; i++) {
-        range.push(i)
-      }
-      
-      return range
-    }
-  },
-  methods: {
-    // 排序方法
-    sortBy(field) {
-      if (this.sortField === field) {
-        this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc'
-      } else {
-        this.sortField = field
-        this.sortOrder = 'asc'
-      }
-    },
-    // 跳转到指定页面
-    goToPage(page) {
-      if (page >= 1 && page <= this.totalPages) {
-        this.currentPage = page
-      }
+      // 部署发布数据
+      deploymentData: [
+        {
+          tenant: '广东农信',
+          appName: '电子管理平台 web 端',
+          appId: '18138565155772782',
+          createdAt: '2025-12-20 10:30:00',
+          totalDeployments: 15,
+          manualDeployments: 5,
+          latestDeploymentTime: '2025-12-20 10:30:00',
+          rollbackCount: 2,
+          configModifyCount: 3,
+          currentPackageVersions: 8,
+          statisticsPeriod: '2025-12',
+          totalPackageSize: 2.5,
+          maxPackageSize: 500,
+          avgPackageSize: 250,
+          appTags: '生产环境,Web应用'
+        },
+        {
+          tenant: '广东农信',
+          appName: '代发薪-企业端',
+          appId: '17835446687603079',
+          createdAt: '2025-12-15 14:20:00',
+          totalDeployments: 20,
+          manualDeployments: 8,
+          latestDeploymentTime: '2025-12-15 14:20:00',
+          rollbackCount: 1,
+          configModifyCount: 5,
+          currentPackageVersions: 10,
+          statisticsPeriod: '2025-12',
+          totalPackageSize: 3.2,
+          maxPackageSize: 800,
+          avgPackageSize: 320,
+          appTags: '生产环境,企业端'
+        },
+        {
+          tenant: '广东农信',
+          appName: '代发薪-企业端（内网）',
+          appId: '18138564290330709',
+          createdAt: '2025-12-10 09:15:00',
+          totalDeployments: 12,
+          manualDeployments: 3,
+          latestDeploymentTime: '2025-12-10 09:15:00',
+          rollbackCount: 0,
+          configModifyCount: 2,
+          currentPackageVersions: 6,
+          statisticsPeriod: '2025-12',
+          totalPackageSize: 1.8,
+          maxPackageSize: 400,
+          avgPackageSize: 200,
+          appTags: '测试环境,内网应用'
+        },
+        {
+          tenant: '广东农信',
+          appName: '共享1016应用',
+          appId: '181385653410758882',
+          createdAt: '2025-12-05 16:45:00',
+          totalDeployments: 8,
+          manualDeployments: 2,
+          latestDeploymentTime: '2025-12-05 16:45:00',
+          rollbackCount: 0,
+          configModifyCount: 1,
+          currentPackageVersions: 4,
+          statisticsPeriod: '2025-12',
+          totalPackageSize: 1.2,
+          maxPackageSize: 300,
+          avgPackageSize: 150,
+          appTags: '测试环境,共享应用'
+        },
+        {
+          tenant: '广东农信',
+          appName: '隔离1016应用',
+          appId: '1784776437802790273',
+          createdAt: '2025-12-01 11:20:00',
+          totalDeployments: 5,
+          manualDeployments: 1,
+          latestDeploymentTime: '2025-12-01 11:20:00',
+          rollbackCount: 0,
+          configModifyCount: 0,
+          currentPackageVersions: 3,
+          statisticsPeriod: '2025-12',
+          totalPackageSize: 0.8,
+          maxPackageSize: 250,
+          avgPackageSize: 120,
+          appTags: '测试环境,隔离应用'
+        },
+        {
+          tenant: '广东农信',
+          appName: '移动银行APP',
+          appId: '18138565155772783',
+          createdAt: '2025-11-30 15:45:00',
+          totalDeployments: 25,
+          manualDeployments: 10,
+          latestDeploymentTime: '2025-11-30 15:45:00',
+          rollbackCount: 3,
+          configModifyCount: 7,
+          currentPackageVersions: 12,
+          statisticsPeriod: '2025-11',
+          totalPackageSize: 4.5,
+          maxPackageSize: 1000,
+          avgPackageSize: 400,
+          appTags: '生产环境,移动应用'
+        },
+        {
+          tenant: '广东农信',
+          appName: '网上银行系统',
+          appId: '17835446687603080',
+          createdAt: '2025-11-25 10:15:00',
+          totalDeployments: 18,
+          manualDeployments: 6,
+          latestDeploymentTime: '2025-11-25 10:15:00',
+          rollbackCount: 1,
+          configModifyCount: 4,
+          currentPackageVersions: 9,
+          statisticsPeriod: '2025-11',
+          totalPackageSize: 3.0,
+          maxPackageSize: 700,
+          avgPackageSize: 300,
+          appTags: '生产环境,Web应用'
+        },
+        {
+          tenant: '广东农信',
+          appName: '信用卡管理系统',
+          appId: '18138564290330710',
+          createdAt: '2025-11-20 14:30:00',
+          totalDeployments: 16,
+          manualDeployments: 4,
+          latestDeploymentTime: '2025-11-20 14:30:00',
+          rollbackCount: 2,
+          configModifyCount: 5,
+          currentPackageVersions: 7,
+          statisticsPeriod: '2025-11',
+          totalPackageSize: 2.8,
+          maxPackageSize: 600,
+          avgPackageSize: 280,
+          appTags: '生产环境,企业端'
+        },
+        {
+          tenant: '广东农信',
+          appName: '风控系统',
+          appId: '181385653410758883',
+          createdAt: '2025-11-15 09:20:00',
+          totalDeployments: 10,
+          manualDeployments: 3,
+          latestDeploymentTime: '2025-11-15 09:20:00',
+          rollbackCount: 0,
+          configModifyCount: 2,
+          currentPackageVersions: 5,
+          statisticsPeriod: '2025-11',
+          totalPackageSize: 1.5,
+          maxPackageSize: 350,
+          avgPackageSize: 180,
+          appTags: '测试环境,风控应用'
+        },
+        {
+          tenant: '广东农信',
+          appName: '数据分析平台',
+          appId: '1784776437802790274',
+          createdAt: '2025-11-10 16:50:00',
+          totalDeployments: 14,
+          manualDeployments: 5,
+          latestDeploymentTime: '2025-11-10 16:50:00',
+          rollbackCount: 1,
+          configModifyCount: 4,
+          currentPackageVersions: 8,
+          statisticsPeriod: '2025-11',
+          totalPackageSize: 2.2,
+          maxPackageSize: 550,
+          avgPackageSize: 240,
+          appTags: '测试环境,数据分析'
+        },
+        {
+          tenant: '广东农信',
+          appName: '人力资源系统',
+          appId: '18138565155772784',
+          createdAt: '2025-10-30 11:15:00',
+          totalDeployments: 9,
+          manualDeployments: 2,
+          latestDeploymentTime: '2025-10-30 11:15:00',
+          rollbackCount: 0,
+          configModifyCount: 1,
+          currentPackageVersions: 4,
+          statisticsPeriod: '2025-10',
+          totalPackageSize: 1.0,
+          maxPackageSize: 280,
+          avgPackageSize: 140,
+          appTags: '测试环境,内部应用'
+        },
+        {
+          tenant: '广东农信',
+          appName: '财务管理系统',
+          appId: '17835446687603081',
+          createdAt: '2025-10-25 15:30:00',
+          totalDeployments: 17,
+          manualDeployments: 7,
+          latestDeploymentTime: '2025-10-25 15:30:00',
+          rollbackCount: 2,
+          configModifyCount: 6,
+          currentPackageVersions: 11,
+          statisticsPeriod: '2025-10',
+          totalPackageSize: 3.5,
+          maxPackageSize: 850,
+          avgPackageSize: 350,
+          appTags: '生产环境,企业端'
+        },
+        {
+          tenant: '广东农信',
+          appName: '客户关系管理系统',
+          appId: '18138564290330711',
+          createdAt: '2025-10-20 10:00:00',
+          totalDeployments: 13,
+          manualDeployments: 4,
+          latestDeploymentTime: '2025-10-20 10:00:00',
+          rollbackCount: 1,
+          configModifyCount: 3,
+          currentPackageVersions: 6,
+          statisticsPeriod: '2025-10',
+          totalPackageSize: 2.0,
+          maxPackageSize: 450,
+          avgPackageSize: 220,
+          appTags: '生产环境,客户管理'
+        },
+        {
+          tenant: '广东农信',
+          appName: '供应链金融系统',
+          appId: '181385653410758884',
+          createdAt: '2025-10-15 14:45:00',
+          totalDeployments: 11,
+          manualDeployments: 3,
+          latestDeploymentTime: '2025-10-15 14:45:00',
+          rollbackCount: 0,
+          configModifyCount: 2,
+          currentPackageVersions: 5,
+          statisticsPeriod: '2025-10',
+          totalPackageSize: 1.6,
+          maxPackageSize: 380,
+          avgPackageSize: 190,
+          appTags: '测试环境,金融应用'
+        },
+        {
+          tenant: '广东农信',
+          appName: '资产负债管理系统',
+          appId: '1784776437802790275',
+          createdAt: '2025-10-10 09:30:00',
+          totalDeployments: 8,
+          manualDeployments: 2,
+          latestDeploymentTime: '2025-10-10 09:30:00',
+          rollbackCount: 0,
+          configModifyCount: 1,
+          currentPackageVersions: 3,
+          statisticsPeriod: '2025-10',
+          totalPackageSize: 0.9,
+          maxPackageSize: 260,
+          avgPackageSize: 130,
+          appTags: '测试环境,财务管理'
+        }
+      ]
     }
   }
 }
@@ -319,177 +389,92 @@ export default {
   min-height: 100vh;
 }
 
-.page-title {
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 20px;
+/* 标签页容器 */
+.tab-container {
+  width: 100%;
 }
 
-.search-filter {
+/* 标签页导航 */
+.version-tabs {
   display: flex;
-  align-items: center;
-  gap: 15px;
+  gap: 40px;
   margin-bottom: 20px;
-  padding: 15px;
-  background-color: white;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 0;
 }
 
-.filter-item {
+/* 标签页按钮 */
+.version-tab {
+  padding: 12px 0;
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 100px;
+  justify-content: center;
 }
 
-.filter-item label {
-  font-size: 14px;
-  color: #666;
-  white-space: nowrap;
+.version-tab:hover {
+  color: #ff5722;
 }
 
-.form-select,
-.form-input {
-  padding: 6px 12px;
-  border: 1px solid #dcdfe6;
-  border-radius: 4px;
-  font-size: 14px;
-  min-width: 120px;
+.version-tab.active {
+  color: #ff5722;
+  border-bottom-color: #ff5722;
+  font-weight: 600;
 }
 
-.form-input {
-  min-width: 150px;
+/* 标签页图标 */
+.version-tab::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
-.search-btn {
-  padding: 6px 16px;
-  background-color: #409eff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+.version-tab:nth-child(1)::before {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 14H5V4h14v12z"/></svg>');
 }
 
-.search-btn:hover {
-  background-color: #66b1ff;
+.version-tab:nth-child(2)::before {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14h-2v-4H8v-2h4V7h2v4h4v2h-4v4z"/></svg>');
 }
 
-.table-container {
-  background-color: white;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
-
-.version-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-}
-
-.version-table th,
-.version-table td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #ebeef5;
-}
-
-.version-table th {
+/* 标签页内容 */
+.tab-content {
+  padding: 20px 0;
   background-color: #f5f7fa;
-  font-weight: bold;
-  color: #333;
-  cursor: pointer;
-  user-select: none;
-}
-
-.version-table th.sortable:hover {
-  background-color: #e6e8eb;
-}
-
-.sort-icon {
-  margin-left: 5px;
-  font-size: 12px;
-  color: #909399;
-}
-
-.version-table tr:hover {
-  background-color: #f5f7fa;
-}
-
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 15px;
-  border-top: 1px solid #ebeef5;
-  gap: 10px;
-}
-
-.page-info {
-  font-size: 14px;
-  color: #666;
-}
-
-.page-buttons {
-  display: flex;
-  gap: 5px;
-}
-
-.page-buttons button {
-  padding: 4px 10px;
-  border: 1px solid #dcdfe6;
-  background-color: white;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.page-buttons button:hover:not(:disabled) {
-  border-color: #409eff;
-  color: #409eff;
-}
-
-.page-buttons button.active {
-  background-color: #409eff;
-  color: white;
-  border-color: #409eff;
-}
-
-.page-buttons button:disabled {
-  cursor: not-allowed;
-  color: #c0c4cc;
-  border-color: #ebeef5;
 }
 
 /* 响应式设计 */
-@media (max-width: 1200px) {
-  .search-filter {
-    flex-wrap: wrap;
-  }
-  
-  .filter-item {
-    flex: 1 1 200px;
-  }
-}
-
 @media (max-width: 768px) {
-  .version-table {
-    font-size: 12px;
+  .version-tabs {
+    flex-direction: column;
+    gap: 0;
   }
   
-  .version-table th,
-  .version-table td {
-    padding: 8px;
+  .version-tab {
+    border-bottom: 1px solid #e0e0e0;
+    border-radius: 0;
+    justify-content: flex-start;
+    padding-left: 12px;
   }
   
-  .form-select,
-  .form-input {
-    min-width: 100px;
-    font-size: 12px;
+  .version-tab.active {
+    border-bottom: 1px solid #ff5722;
+    background-color: rgba(255, 87, 34, 0.05);
   }
 }
 </style>
