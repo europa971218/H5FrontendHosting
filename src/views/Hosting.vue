@@ -1,26 +1,6 @@
 <template>
   <div class="hosting">
-    <!-- 顶部导航栏 -->
-    <header class="top-nav">
-      <div class="nav-tabs">
-        <router-link to="/applications" class="tab">应用管理</router-link>
-        <router-link to="/data-overview" class="tab">数据概览</router-link>
-        <router-link to="/tenant-management" class="tab">租户管理</router-link>
-        <router-link to="/user-management" class="tab">用户管理</router-link>
-        <router-link to="/organization-management" class="tab">机构管理</router-link>
-        <router-link to="/hosting" class="tab" :class="{ active: $route.path === '/hosting' }">托管管理</router-link>
-        <router-link to="/platform-monitoring" class="tab">平台监控</router-link>
-        <router-link to="/alert-center" class="tab">告警中心</router-link>
-        <router-link to="/platform-logs" class="tab">平台日志</router-link>
-        <router-link to="/operation-audit" class="tab">操作审计</router-link>
-        <router-link to="/user-feedback" class="tab">用户反馈</router-link>
-        <router-link to="/help-center" class="tab">帮助中心</router-link>
-        <router-link to="/monitoring-management" class="tab">监控管理</router-link>
-        <router-link to="/version-management" class="tab">版本管理</router-link>
-        <router-link to="/link-management" class="tab" :class="{ active: $route.path === '/link-management' }">链路管理</router-link>
-      </div>
-    </header>
-
+   
     <!-- 页面内容 -->
     <main class="content">
       <!-- 托管页面标题 -->
