@@ -85,7 +85,8 @@
 
       <!-- 数据表格 -->
       <div class="table-container animate__animated animate__fadeInUp">
-        <table class="data-table">
+        <div v-if="loading" class="loading">加载中...</div>
+        <table v-else class="data-table">
           <thead>
             <tr>
               <th><input type="checkbox" class="select-all"></th>
@@ -99,14 +100,21 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr v-for="app in applications" :key="app.id">
               <td><input type="checkbox"></td>
-              <td>银行APP</td>
-              <td>APP001</td>
-              <td>移动端应用</td>
-              <td><span class="status status-running"><font-awesome-icon icon="play-circle" /> 运行中</span></td>
-              <td>2025-12-01</td>
-              <td>2026-01-22</td>
+              <td>{{ app.appName }}</td>
+              <td>{{ app.appId }}</td>
+              <td>{{ app.type }}</td>
+              <td>
+                <span :class="['status', app.status === '运行中' ? 'status-running' : app.status === '已停止' ? 'status-stopped' : 'status-error']">
+                  <font-awesome-icon v-if="app.status === '运行中'" icon="play-circle" /> 
+                  <font-awesome-icon v-else-if="app.status === '已停止'" icon="stop-circle" /> 
+                  <font-awesome-icon v-else icon="exclamation-circle" /> 
+                  {{ app.status }}
+                </span>
+              </td>
+              <td>{{ new Date(app.createTime).toLocaleDateString() }}</td>
+              <td>{{ new Date(app.updateTime).toLocaleDateString() }}</td>
               <td>
                 <button class="action-btn view" v-wave>
                   <font-awesome-icon icon="eye" /> 查看
@@ -114,58 +122,17 @@
                 <button class="action-btn edit" v-wave>
                   <font-awesome-icon icon="edit" /> 编辑
                 </button>
-                <button class="action-btn stop" v-wave>
-                  <font-awesome-icon icon="stop-circle" /> 停止
+                <button class="action-btn" :class="app.status === '运行中' ? 'stop' : 'start'" v-wave>
+                  <font-awesome-icon :icon="app.status === '运行中' ? 'stop-circle' : 'play-circle'" /> 
+                  {{ app.status === '运行中' ? '停止' : '启动' }}
                 </button>
                 <button class="action-btn delete" v-wave>
                   <font-awesome-icon icon="trash-alt" /> 删除
                 </button>
               </td>
             </tr>
-            <tr>
-              <td><input type="checkbox"></td>
-              <td>网银系统</td>
-              <td>APP002</td>
-              <td>Web应用</td>
-              <td><span class="status status-running">运行中</span></td>
-              <td>2025-12-05</td>
-              <td>2026-01-21</td>
-              <td>
-                <button class="action-btn view">查看</button>
-                <button class="action-btn edit">编辑</button>
-                <button class="action-btn stop">停止</button>
-                <button class="action-btn delete">删除</button>
-              </td>
-            </tr>
-            <tr>
-              <td><input type="checkbox"></td>
-              <td>支付网关</td>
-              <td>APP003</td>
-              <td>API服务</td>
-              <td><span class="status status-running">运行中</span></td>
-              <td>2025-12-10</td>
-              <td>2026-01-20</td>
-              <td>
-                <button class="action-btn view">查看</button>
-                <button class="action-btn edit">编辑</button>
-                <button class="action-btn stop">停止</button>
-                <button class="action-btn delete">删除</button>
-              </td>
-            </tr>
-            <tr>
-              <td><input type="checkbox"></td>
-              <td>数据分析系统</td>
-              <td>APP004</td>
-              <td>Web应用</td>
-              <td><span class="status status-stopped">已停止</span></td>
-              <td>2025-12-15</td>
-              <td>2026-01-19</td>
-              <td>
-                <button class="action-btn view">查看</button>
-                <button class="action-btn edit">编辑</button>
-                <button class="action-btn start">启动</button>
-                <button class="action-btn delete">删除</button>
-              </td>
+            <tr v-if="applications.length === 0">
+              <td colspan="8" class="no-data">暂无应用数据</td>
             </tr>
           </tbody>
         </table>
@@ -173,12 +140,11 @@
 
       <!-- 分页 -->
       <div class="pagination">
-        <div class="pagination-info">共 4 条记录</div>
+        <div class="pagination-info">共 {{ applications.length }} 条记录</div>
         <div class="pagination-controls">
-          <button class="page-btn prev">上一页</button>
+          <button class="page-btn prev" :disabled="true">上一页</button>
           <button class="page-btn active">1</button>
-          <button class="page-btn">2</button>
-          <button class="page-btn next">下一页</button>
+          <button class="page-btn next" :disabled="true">下一页</button>
         </div>
       </div>
     </main>
@@ -191,17 +157,73 @@ export default {
   data() {
     return {
       applications: [],
-      dateRange: null // 日期范围
+      dateRange: null, // 日期范围
+      loading: false
     }
   },
   mounted() {
+    // 设置JWT令牌到localStorage
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImNhb2hhbiIsInJvbGUiOiJzeXNhZG1pbiIsInRlbmFudElkIjpudWxsLCJpYXQiOjE3NzQ0OTYzNDIsImV4cCI6MTc3NDQ5OTk0Mn0.l4ON3KGnuXeQm5_VjOUqGST-VIJzVozjzYNRKPi9qpw'
+    localStorage.setItem('token', token)
+    console.log('Token set to localStorage:', token)
+    
     // 初始化数据
     this.loadApplications()
   },
   methods: {
-    loadApplications() {
-      // 模拟加载数据
-      console.log('加载应用列表')
+    async loadApplications() {
+      this.loading = true
+      try {
+        console.log('Loading applications...')
+        // 从后端API获取应用列表
+        const token = localStorage.getItem('token')
+        console.log('Token:', token)
+        
+        const response = await fetch('http://localhost:3005/api/hosting-apps', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (token || 'test-token')
+          }
+        })
+        console.log('Response status:', response.status)
+        
+        if (response.ok) {
+          const data = await response.json()
+          console.log('Loaded applications:', data)
+          this.applications = data.map(app => ({
+            id: app.id,
+            appName: app.appName,
+            appId: app.appId,
+            type: app.userType,
+            status: this.getStatus(app),
+            createTime: app.createdAt,
+            updateTime: app.updatedAt
+          }))
+        } else {
+          console.error('Failed to load applications:', response.statusText)
+          // 尝试获取详细错误信息
+          try {
+            const errorData = await response.json()
+            console.error('Error data:', errorData)
+          } catch (e) {
+            console.error('Failed to parse error response:', e)
+          }
+        }
+      } catch (error) {
+        console.error('Error loading applications:', error)
+      } finally {
+        this.loading = false
+      }
+    },
+    getStatus(app) {
+      // 根据应用状态返回相应的状态文本
+      if (app.testEnv === '已移入' && app.productionEnv === '已移入') {
+        return '运行中'
+      } else if (app.testEnv === '未移入' && app.productionEnv === '未移入') {
+        return '已停止'
+      } else {
+        return '异常'
+      }
     }
   }
 }
@@ -497,6 +519,22 @@ export default {
 .page-btn.prev,
 .page-btn.next {
   padding: 6px 12px;
+}
+
+/* 加载状态 */
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-size: 14px;
+}
+
+/* 无数据状态 */
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  font-size: 14px;
 }
 
 @media (max-width: 768px) {

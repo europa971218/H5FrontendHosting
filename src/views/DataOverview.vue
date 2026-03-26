@@ -214,6 +214,11 @@
             format="YYYY-MM"
             value-format="YYYY-MM"
             style="width: 200px"
+            :picker-options="{
+              type: 'month',
+              startDate: new Date('2025-01'),
+              endDate: new Date('2027-12')
+            }"
           />
         </div>
       </div>
@@ -378,6 +383,11 @@
               format="YYYY-MM"
               value-format="YYYY-MM"
               style="width: 200px"
+              :picker-options="{
+                type: 'month',
+                startDate: new Date('2025-01'),
+                endDate: new Date('2027-12')
+              }"
             />
           </div>
         </div>
@@ -523,6 +533,11 @@
               format="YYYY-MM"
               value-format="YYYY-MM"
               style="width: 200px"
+              :picker-options="{
+                type: 'month',
+                startDate: new Date('2025-01'),
+                endDate: new Date('2027-12')
+              }"
             />
           </div>
         </div>
@@ -639,6 +654,11 @@
               format="YYYY-MM"
               value-format="YYYY-MM"
               style="width: 200px"
+              :picker-options="{
+                type: 'month',
+                startDate: new Date('2025-01'),
+                endDate: new Date('2027-12')
+              }"
             />
           </div>
         </div>
@@ -935,13 +955,23 @@ export default {
     async fetchDataFromBackend() {
       try {
         // 调用后端API获取数据概览
-        const response = await fetch('http://localhost:3003/api/data/overview')
+        const token = localStorage.getItem('token')
+        const response = await fetch('http://localhost:3005/api/data/overview', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (token || 'test-token')
+          }
+        })
+        console.log('Data overview API response:', response.status)
         if (response.ok) {
           const result = await response.json()
+          console.log('Data overview API result:', result)
           if (result.success) {
             this.backendData = result.data
             this.initCharts() // 数据获取成功后初始化图表
           }
+        } else {
+          console.error('Failed to fetch data overview:', response.statusText)
         }
       } catch (error) {
         console.error('Failed to fetch data from backend:', error)

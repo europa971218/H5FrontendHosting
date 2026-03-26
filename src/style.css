@@ -146,3 +146,113 @@ h1, h2, h3, h4, h5, h6 {
 .p-1 { padding: 0.5rem; }
 .p-2 { padding: 1rem; }
 .p-3 { padding: 1.5rem; }
+
+/* 统计类型切换样式 */
+.stat-type {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stat-btn {
+  padding: 0.5rem 1.5rem;
+  margin-right: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.stat-btn.active {
+  background: #1e3c72;
+  color: white;
+  border-color: #1e3c72;
+}
+
+.stat-btn:hover {
+  border-color: #1e3c72;
+  color: #1e3c72;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+}
+
+.filter-group label {
+  margin-right: 0.75rem;
+  font-weight: 500;
+  color: #555;
+}
+
+/* 日期选择器样式 */
+.el-date-picker {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.el-date-picker__header {
+  background: #f8f9fa;
+  border-bottom: 1px solid #eee;
+}
+
+.el-date-picker__header-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e3c72;
+}
+
+.el-date-picker__prev-btn:hover, .el-date-picker__next-btn:hover {
+  color: #1e3c72;
+}
+
+.el-date-table th {
+  color: #666;
+  font-weight: 500;
+}
+
+.el-date-table td {
+  padding: 0.5rem;
+}
+
+.el-date-table td:hover {
+  background: #f0f5ff;
+}
+
+.el-date-table .current {
+  color: #1e3c72;
+  font-weight: 600;
+}
+
+.el-date-table .active {
+  background: #1e3c72;
+  color: white;
+  border-radius: 4px;
+}
+
+.el-date-table .active:hover {
+  background: #2a5298;
+  color: white;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .stat-type {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .filter-group {
+    width: 100%;
+  }
+  
+  .el-date-picker {
+    width: 100%;
+  }
+}

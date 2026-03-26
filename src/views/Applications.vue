@@ -1,144 +1,111 @@
 <template>
   <div class="applications-container">
-    <!-- 顶部导航栏 -->
-    <header class="top-nav">
-      <div class="nav-tabs">
-        <router-link to="/applications" class="tab" :class="{ active: $route.path === '/applications' }">应用管理</router-link>
-        <router-link to="/data-overview" class="tab">数据概览</router-link>
-        <router-link to="/tenant-management" class="tab">租户管理</router-link>
-        <router-link to="/user-management" class="tab">用户管理</router-link>
-        <router-link to="/organization-management" class="tab">机构管理</router-link>
-        <router-link to="/hosting" class="tab">托管管理</router-link>
-        <router-link to="/platform-monitoring" class="tab">平台监控</router-link>
-        <router-link to="/alert-center" class="tab">告警中心</router-link>
-        <router-link to="/platform-logs" class="tab">平台日志</router-link>
-        <router-link to="/operation-audit" class="tab">操作审计</router-link>
-        <router-link to="/user-feedback" class="tab">用户反馈</router-link>
-        <router-link to="/help-center" class="tab">帮助中心</router-link>
-        <router-link to="/monitoring-management" class="tab">监控管理</router-link>
-        <router-link to="/version-management" class="tab">版本管理</router-link>
-      </div>
-    </header>
-
     <!-- 页面内容 -->
     <main class="content">
-      <!-- 应用管理标题 -->
-      <div class="section-header">
-        <h2><font-awesome-icon icon="th-large" /> 应用管理</h2>
-      </div>
-
-      <!-- 统计类型切换 -->
-      <div class="stat-type">
-        <button class="stat-btn" :class="{ active: activeStatType === '月度统计' }" @click="changeStatType('月度统计')">月度统计</button>
-        <button class="stat-btn" :class="{ active: activeStatType === '季度统计' }" @click="changeStatType('季度统计')">季度统计</button>
-        <div class="filter-group" style="margin-left: auto;">
-          <label>统计周期</label>
-          <el-date-picker
-            v-model="dateRange"
-            type="daterange"
-            range-separator=" - "
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            format="YYYY-MM"
-            value-format="YYYY-MM"
-            style="width: 200px"
-          />
-        </div>
-      </div>
-
-      <!-- 应用列表 -->
-      <div class="card">
-        <h3>应用列表</h3>
-        <div class="table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>应用ID</th>
-                <th>应用名称</th>
-                <th>租户</th>
-                <th>状态</th>
-                <th>部署次数</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1,906,877,333,060,034,561</td>
-                <td>电子管理平台 web 端</td>
-                <td>租户1</td>
-                <td><span class="status-tag active">运行中</span></td>
-                <td>19</td>
-                <td>
-                  <button class="btn btn-sm" @click="navigateToAppOverview">查看</button>
-                  <button class="btn btn-sm">编辑</button>
-                  <button class="btn btn-sm" @click="navigateToHosting">部署</button>
-                </td>
-              </tr>
-              <tr>
-                <td>1,914,260,039,585,026,049</td>
-                <td>代发薪-企业端</td>
-                <td>租户2</td>
-                <td><span class="status-tag active">运行中</span></td>
-                <td>15</td>
-                <td>
-                  <button class="btn btn-sm" @click="navigateToAppOverview">查看</button>
-                  <button class="btn btn-sm">编辑</button>
-                  <button class="btn btn-sm" @click="navigateToHosting">部署</button>
-                </td>
-              </tr>
-              <tr>
-                <td>1,928,369,597,602,971,650</td>
-                <td>代发薪-企业端（内网）</td>
-                <td>租户2</td>
-                <td><span class="status-tag active">运行中</span></td>
-                <td>9</td>
-                <td>
-                  <button class="btn btn-sm" @click="navigateToAppOverview">查看</button>
-                  <button class="btn btn-sm">编辑</button>
-                  <button class="btn btn-sm" @click="navigateToHosting">部署</button>
-                </td>
-              </tr>
-              <tr>
-                <td>1,978,291,280,274,882,561</td>
-                <td>共享1016应用</td>
-                <td>租户1</td>
-                <td><span class="status-tag inactive">已停止</span></td>
-                <td>10</td>
-                <td>
-                  <button class="btn btn-sm" @click="navigateToAppOverview">查看</button>
-                  <button class="btn btn-sm">编辑</button>
-                  <button class="btn btn-sm" @click="navigateToHosting">部署</button>
-                </td>
-              </tr>
-              <tr>
-                <td>1,978,291,103,929,565,186</td>
-                <td>隔离1016应用</td>
-                <td>租户3</td>
-                <td><span class="status-tag active">运行中</span></td>
-                <td>7</td>
-                <td>
-                  <button class="btn btn-sm" @click="navigateToAppOverview">查看</button>
-                  <button class="btn btn-sm">编辑</button>
-                  <button class="btn btn-sm" @click="navigateToHosting">部署</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- 应用部署统计 -->
-      <div class="charts-row">
-        <div class="chart-card">
-          <h3>应用部署趋势</h3>
-          <div class="chart-container" ref="appDeploymentChart"></div>
+      <!-- 应用管理内容 -->
+    
+        <!-- 应用管理标题 -->
+        <div class="section-header">
+          <h2><font-awesome-icon icon="th-large" /> 应用管理</h2>
         </div>
 
-        <div class="chart-card">
-          <h3>应用状态分布</h3>
-          <div class="chart-container" ref="appStatusChart"></div>
+        <!-- 统计类型切换 -->
+        <div class="stat-type">
+          <button class="stat-btn" :class="{ active: activeStatType === '月度统计' }" @click="changeStatType('月度统计')">月度统计</button>
+          <button class="stat-btn" :class="{ active: activeStatType === '季度统计' }" @click="changeStatType('季度统计')">季度统计</button>
+          <div class="filter-group" style="margin-left: auto;">
+            <label>统计周期</label>
+            <el-date-picker
+              v-model="dateRange"
+              type="daterange"
+              range-separator=" - "
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              format="YYYY-MM"
+              value-format="YYYY-MM"
+              style="width: 200px"
+            />
+          </div>
         </div>
-      </div>
+
+        <!-- 应用列表 -->
+        <div class="card">
+          <h3>应用列表</h3>
+          <div class="table-container">
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>租户</th>
+                    <th>产品线</th>
+                    <th>产品</th>
+                    <th>应用</th>
+                    <th>应用 ID</th>
+                    <th>创建时间</th>
+                    <th>应用负责人</th>
+                    <th>应用类型</th>
+                    <th @click="appSortBy('accessType')" class="sortable">
+                      访问类型
+                      <span v-if="appSortField === 'accessType'" class="sort-icon">{{ appSortOrder === 'asc' ? '↑' : '↓' }}</span>
+                    </th>
+                    <th>用途</th>
+                    <th @click="appSortBy('status')" class="sortable">
+                      接入状态
+                      <span v-if="appSortField === 'status'" class="sort-icon">{{ appSortOrder === 'asc' ? '↑' : '↓' }}</span>
+                    </th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(app, index) in paginatedApps" :key="index">
+                    <td>{{ app.tenant }}</td>
+                    <td>{{ app.productLine }}</td>
+                    <td>{{ app.product }}</td>
+                    <td>{{ app.name }}</td>
+                    <td>{{ app.id }}</td>
+                    <td>{{ app.createTime }}</td>
+                    <td>{{ app.owner }}</td>
+                    <td>{{ app.type }}</td>
+                    <td>{{ app.accessType }}</td>
+                    <td>{{ app.purpose }}</td>
+                    <td><span class="status-tag" :class="app.statusClass">{{ app.status }}</span></td>
+                    <td>
+                      <button class="btn btn-sm" @click="navigateToAppOverview">查看</button>
+                      <button class="btn btn-sm">编辑</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <!-- 分页控件 -->
+            <div class="pagination">
+              <el-pagination
+                v-model:current-page="currentAppPage"
+                v-model:page-size="appPageSize"
+                :page-sizes="[10, 20, 50, 100]"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="totalApps"
+                @size-change="handleAppSizeChange"
+                @current-change="handleAppCurrentChange"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- 应用部署统计 -->
+        <div class="charts-row">
+          <div class="chart-card">
+            <h3>应用部署趋势</h3>
+            <div class="chart-container" ref="appDeploymentChart"></div>
+          </div>
+
+          <div class="chart-card">
+            <h3>应用状态分布</h3>
+            <div class="chart-container" ref="appStatusChart"></div>
+          </div>
+        </div>
+
     </main>
   </div>
 </template>
@@ -150,10 +117,69 @@ export default {
   name: 'Applications',
   data() {
     return {
+      // 应用管理相关数据
       activeStatType: '月度统计',
       dateRange: ['2025-12', '2026-01'],
-      charts: {}
+      charts: {},
+      // 应用列表数据
+      appData: [],
+      loading: false,
+      // 应用列表分页数据
+      currentAppPage: 1,
+      appPageSize: 10,
+      jumpAppPage: 1,
+      // 应用列表排序数据
+      appSortField: '',
+      appSortOrder: 'asc'
     }
+  },
+  computed: {
+    // 应用列表计算属性
+    totalApps() {
+      return this.appData.length
+    },
+    totalAppPages() {
+      return Math.ceil(this.totalApps / this.appPageSize)
+    },
+    paginatedApps() {
+      // 先排序
+      let sortedData = [...this.appData]
+      if (this.appSortField) {
+        sortedData.sort((a, b) => {
+          let valueA = a[this.appSortField]
+          let valueB = b[this.appSortField]
+          
+          if (valueA < valueB) {
+            return this.appSortOrder === 'asc' ? -1 : 1
+          }
+          if (valueA > valueB) {
+            return this.appSortOrder === 'asc' ? 1 : -1
+          }
+          return 0
+        })
+      }
+      
+      // 再分页
+      const startIndex = (this.currentAppPage - 1) * this.appPageSize
+      const endIndex = startIndex + this.appPageSize
+      return sortedData.slice(startIndex, endIndex)
+    },
+    appPageRange() {
+      const range = []
+      const total = this.totalAppPages
+      const current = this.currentAppPage
+      
+      // 显示当前页附近的页码
+      const start = Math.max(1, current - 2)
+      const end = Math.min(total, start + 4)
+      
+      for (let i = start; i <= end; i++) {
+        range.push(i)
+      }
+      
+      return range
+    },
+
   },
   methods: {
     // 导航到应用托管视图
@@ -186,20 +212,24 @@ export default {
       const isQuarterly = this.activeStatType === '季度统计'
       
       // 应用部署趋势 - 折线图
-      this.charts.appDeployment = this.initLineChart(
-        this.$refs.appDeploymentChart,
-        isQuarterly ? ['2025-Q4', '2026-Q1'] : ['2025-12', '2026-01'],
-        isQuarterly ? [150, 200] : [187, 203],
-        '应用部署趋势'
-      )
+      if (this.$refs.appDeploymentChart) {
+        this.charts.appDeployment = this.initLineChart(
+          this.$refs.appDeploymentChart,
+          isQuarterly ? ['2025-Q4', '2026-Q1'] : ['2025-12', '2026-01'],
+          isQuarterly ? [150, 200] : [187, 203],
+          '应用部署趋势'
+        )
+      }
 
       // 应用状态分布 - 饼图
-      this.charts.appStatus = this.initPieChart(
-        this.$refs.appStatusChart,
-        ['运行中', '已停止', '部署中', '异常'],
-        [65, 20, 10, 5],
-        '应用状态分布'
-      )
+      if (this.$refs.appStatusChart) {
+        this.charts.appStatus = this.initPieChart(
+          this.$refs.appStatusChart,
+          ['运行中', '已停止', '部署中', '异常'],
+          [65, 20, 10, 5],
+          '应用状态分布'
+        )
+      }
     },
     // 初始化折线图
     initLineChart(dom, categories, data, title) {
@@ -331,12 +361,97 @@ export default {
     // 调整图表大小
     resizeCharts() {
       Object.values(this.charts).forEach(chart => chart.resize())
+    },
+
+    // 应用列表分页方法
+    handleAppSizeChange(size) {
+      this.appPageSize = size
+      this.currentAppPage = 1
+    },
+    handleAppCurrentChange(current) {
+      this.currentAppPage = current
+    },
+    // 应用列表排序方法
+    appSortBy(field) {
+      if (this.appSortField === field) {
+        this.appSortOrder = this.appSortOrder === 'asc' ? 'desc' : 'asc'
+      } else {
+        this.appSortField = field
+        this.appSortOrder = 'asc'
+      }
     }
   },
   mounted() {
+    // 设置JWT令牌到localStorage
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJ1c2VybmFtZSI6ImNhb2hhbiIsInJvbGUiOiJzeXNhZG1pbiIsInRlbmFudElkIjpudWxsLCJpYXQiOjE3NzQ0OTYzNDIsImV4cCI6MTc3NDQ5OTk0Mn0.l4ON3KGnuXeQm5_VjOUqGST-VIJzVozjzYNRKPi9qpw'
+    localStorage.setItem('token', token)
+    console.log('Token set to localStorage:', token)
+    
+    this.loadApplications()
     this.initCharts()
     // 监听窗口大小变化，自动调整图表大小
     window.addEventListener('resize', this.resizeCharts)
+  },
+  methods: {
+    async loadApplications() {
+      this.loading = true
+      try {
+        console.log('Loading applications...')
+        // 从后端API获取应用列表
+        const token = localStorage.getItem('token')
+        console.log('Token:', token)
+        
+        const response = await fetch('http://localhost:3005/api/hosting-apps', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (token || 'test-token')
+          }
+        })
+        console.log('Response status:', response.status)
+        
+        if (response.ok) {
+          const data = await response.json()
+          console.log('Loaded applications:', data)
+          this.appData = data.map(app => ({
+            tenant: app.tenantId,
+            productLine: app.productLine,
+            product: app.product,
+            name: app.appName,
+            id: app.appId,
+            createTime: new Date(app.createdAt).toLocaleDateString(),
+            owner: app.responsiblePerson,
+            type: app.userType,
+            accessType: app.accessType,
+            purpose: this.getAppPurpose(app),
+            status: (app.testEnv === '已移入' && app.productionEnv === '已移入') ? '已接入' : '未接入',
+            statusClass: (app.testEnv === '已移入' && app.productionEnv === '已移入') ? 'active' : 'inactive'
+          }))
+        } else {
+          console.error('Failed to load applications:', response.statusText)
+          // 尝试获取详细错误信息
+          try {
+            const errorData = await response.json()
+            console.error('Error data:', errorData)
+          } catch (e) {
+            console.error('Failed to parse error response:', e)
+          }
+        }
+      } catch (error) {
+        console.error('Error loading applications:', error)
+      } finally {
+        this.loading = false
+      }
+    },
+    getAppPurpose(app) {
+      // 根据应用类型和业务区域判断用途
+      if (app.systemType === '金融应用') {
+        return '金融服务'
+      } else if (app.systemType === '测试应用') {
+        return '测试用途'
+      } else {
+        return '企业管理'
+      }
+    }
   },
   beforeUnmount() {
     // 清理图表实例
@@ -359,35 +474,41 @@ export default {
   border-bottom: 1px solid #e0e0e0;
   padding: 0 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
 }
 
 .nav-tabs {
   display: flex;
-  gap: 8px;
-  padding: 15px 0;
-  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 0;
   justify-content: flex-start;
+  align-items: center;
 }
 
 .tab {
-  padding: 8px 12px;
-  font-size: 0.85rem;
+  padding: 8px 14px;
+  font-size: 0.8rem;
   color: #666;
   cursor: pointer;
   border-radius: 4px;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   white-space: nowrap;
+  text-decoration: none;
+  font-weight: 400;
 }
 
 .tab:hover {
-  background-color: #f0f0f0;
+  background-color: #f0f7ff;
+  color: #1e3c72;
 }
 
 .tab.active {
   background-color: #1e3c72;
   color: white;
   font-weight: 500;
+  box-shadow: 0 2px 4px rgba(30, 60, 114, 0.2);
 }
 
 /* 内容区 */
@@ -480,6 +601,13 @@ export default {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table-wrapper {
+  min-width: 1200px;
+  width: 100%;
 }
 
 /* 数据表格 */
@@ -502,6 +630,21 @@ export default {
   font-weight: 600;
   color: #333;
   font-size: 0.85rem;
+}
+
+.data-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.data-table th.sortable:hover {
+  background-color: #e6e8eb;
+}
+
+.data-table th .sort-icon {
+  margin-left: 5px;
+  font-size: 12px;
+  color: #909399;
 }
 
 .data-table tbody tr:hover {
@@ -600,6 +743,65 @@ export default {
   font-size: 11px;
 }
 
+
+
+/* 表格滚动容器 */
+.table-container {
+  overflow-x: auto;
+  position: relative;
+}
+
+.table-wrapper {
+  width: 100%;
+  min-width: 1600px;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 15px;
+  border-top: 1px solid #ebeef5;
+  gap: 10px;
+}
+
+.page-info {
+  font-size: 14px;
+  color: #666;
+}
+
+.page-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.page-buttons button {
+  padding: 4px 10px;
+  border: 1px solid #dcdfe6;
+  background-color: white;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.page-buttons button:hover:not(:disabled) {
+  border-color: #409eff;
+  color: #409eff;
+}
+
+.page-buttons button.active {
+  background-color: #409eff;
+  color: white;
+  border-color: #409eff;
+}
+
+.page-buttons button:disabled {
+  cursor: not-allowed;
+  color: #c0c4cc;
+  border-color: #ebeef5;
+}
+
 /* 响应式设计 */
 @media (max-width: 1200px) {
   .table-container {
@@ -625,13 +827,44 @@ export default {
     padding: 15px;
   }
   
+  .top-nav {
+    position: relative;
+  }
+  
   .nav-tabs {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    z-index: 1000;
     gap: 5px;
   }
   
+  .top-nav::after {
+    content: '☰';
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #1e3c72;
+  }
+  
+  .top-nav:hover .nav-tabs {
+    display: flex;
+  }
+  
   .tab {
-    padding: 6px 12px;
-    font-size: 0.85rem;
+    padding: 10px 15px;
+    font-size: 0.9rem;
+    width: 100%;
+    text-align: left;
   }
   
   .filters {

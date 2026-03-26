@@ -99,6 +99,46 @@ const routes = [
     path: '/version-management',
     name: 'VersionManagement',
     component: VersionManagement
+  },
+  {
+    path: '/tenant-management',
+    name: 'TenantManagement',
+    component: Home
+  },
+  {
+    path: '/user-management',
+    name: 'UserManagement',
+    component: Home
+  },
+  {
+    path: '/organization-management',
+    name: 'OrganizationManagement',
+    component: Home
+  },
+  {
+    path: '/alert-center',
+    name: 'AlertCenter',
+    component: Home
+  },
+  {
+    path: '/platform-logs',
+    name: 'PlatformLogs',
+    component: Home
+  },
+  {
+    path: '/user-feedback',
+    name: 'UserFeedback',
+    component: Home
+  },
+  {
+    path: '/help-center',
+    name: 'HelpCenter',
+    component: Home
+  },
+  {
+    path: '/monitoring-management',
+    name: 'MonitoringManagement',
+    component: Home
   }
 ]
 
